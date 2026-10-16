@@ -6,6 +6,8 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { deviceProfile } from './deviceTier.ts';
 import type { DetailMessage, DetailRequest } from '../workers/engineDetailWorker.ts';
 import { publish } from './loadProgress.ts';
+import { createAsyncResourceCache } from './asyncResource.ts';
+import { webgl2Available } from './graphics.ts';
 
 export const BADGE_URL = '/models/logo-articulated.glb';
 
@@ -64,15 +66,9 @@ async function finishGrowing(reader: ReadableStreamDefaultReader<Uint8Array>, by
   return exact(buffer, size);
 }
 
-const glbCache = new Map<string, Promise<GLTF>>();
+const glbCache = createAsyncResourceCache<string, GLTF>();
 function loadGLB(url: string, onProgress: (fraction: number) => void) {
-  let cached = glbCache.get(url);
-  if (!cached) {
-    cached = fetchWithProgress(url, onProgress).then(buffer => gltfLoader().parseAsync(buffer, '/models/'));
-    cached.catch(() => glbCache.delete(url)); // A failed request may be retried later.
-    glbCache.set(url, cached);
-  }
-  return cached;
+  return glbCache(url, () => fetchWithProgress(url, onProgress).then(buffer => gltfLoader().parseAsync(buffer, '/models/')));
 }
 
 export const loadBadge = () => loadGLB(BADGE_URL, fraction => publish({ badge: fraction }));
@@ -183,12 +179,15 @@ export function loadEngineAssets() {
       return { gltf, mesh, detailMap: makeDetailTexture(new Uint8Array([128, 128, 128, 255]), 1), analyzed: false, milliseconds: 0 };
     }
   })();
-  engineAssets.catch(() => { engineAssets = null; publish({ stage: 'error' }); });
+  // Keep the rejected promise stable so the section's error boundary can render
+  // its fallback instead of restarting the download on every Suspense retry.
+  engineAssets.catch(() => { publish({ stage: 'error' }); });
   return engineAssets;
 }
 
 /** Badge first (critical path for the hero), then the engine while the visitor reads the hero. */
 export function prefetchAssets() {
+  if (!webgl2Available) return;
   const idle = (callback: () => void) => typeof window.requestIdleCallback === 'function'
     ? window.requestIdleCallback(callback, { timeout: 2500 })
     : window.setTimeout(callback, 600);

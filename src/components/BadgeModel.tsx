@@ -6,7 +6,7 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { motion } from '../motion';
 import { BADGE_IN, BADGE_OUT } from '../lib/cameraSolver.ts';
 import { badgeChannel } from '../lib/motionClient.ts';
-import { useSceneActivity } from './sceneHooks';
+import { useGraphicsRecovery, useSceneActivity } from './sceneHooks';
 
 /** The forged badge: lettering, plate and wrenches stay upright; only GearAssembly turns. */
 export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boolean }) {
@@ -19,6 +19,7 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
   }, [gltf]);
   const tilt = useRef<Group>(null);
   const { visible, invalidate } = useSceneActivity(reduced);
+  const recovery = useGraphicsRecovery();
 
   useFrame((_, frameDelta) => {
     if (!tilt.current || !visible.current || document.hidden) return;
@@ -47,10 +48,12 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
     {/* Captured once: narrow studio reflections reveal the bevels and socket depth
         without animated lights, postprocessing passes, or per-frame allocations. */}
     <Environment resolution={256} frames={1}>
-      <Lightformer intensity={3.4} color="#fff2df" position={[-1, 4, 3]} scale={[7, 1.4, 1]} />
-      <Lightformer intensity={2.6} color="#d4e5ff" position={[-4, 0, 2]} scale={[.7, 7, 1]} />
-      <Lightformer intensity={2.2} position={[4, 1, 1]} scale={[.45, 6, 1]} />
-      <Lightformer intensity={1.4} position={[0, -4, 2]} scale={[5, .4, 1]} />
+      <group name={`Badge reflection capture ${recovery}`}>
+        <Lightformer intensity={3.4} color="#fff2df" position={[-1, 4, 3]} scale={[7, 1.4, 1]} />
+        <Lightformer intensity={2.6} color="#d4e5ff" position={[-4, 0, 2]} scale={[.7, 7, 1]} />
+        <Lightformer intensity={2.2} position={[4, 1, 1]} scale={[.45, 6, 1]} />
+        <Lightformer intensity={1.4} position={[0, -4, 2]} scale={[5, .4, 1]} />
+      </group>
     </Environment>
     <group ref={tilt} scale={1.38}><primitive object={badge} /></group>
   </>;

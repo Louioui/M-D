@@ -1,4 +1,4 @@
-import { Component, Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Hand, ScanLine } from 'lucide-react';
@@ -9,18 +9,12 @@ import { engineHud } from '../lib/engineHud.ts';
 import { INSPECTION_MODES, type InspectionMode } from '../lib/inspection.ts';
 import LoadingGauge from './LoadingGauge';
 import Words from './Words';
+import AssetBoundary from './AssetBoundary';
 import './EngineShowcase.css';
 
 const EngineStage = lazy(() => import('./EngineStage'));
 gsap.registerPlugin(ScrollTrigger);
 const debugZones = new URLSearchParams(location.search).has('zones');
-
-class LoadBoundary extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
-  componentDidCatch(error: unknown) { console.error('[md] engine assets failed to load.', error); }
-  render() { return this.state.failed ? this.props.fallback : this.props.children; }
-}
 
 export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; onBook: (service: ServiceKey) => void }) {
   const { copy } = useLanguage();
@@ -141,9 +135,9 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
       <div ref={visual} className="engine-visual-stage">
         <div className="engine-studio-light" aria-hidden="true" />
         <div className="engine-stage-canvas">
-          {near && <LoadBoundary fallback={<div className="engine-fallback">{tour.fallback}</div>}>
+          {near && <AssetBoundary name="Engine" fallback={<div className="engine-fallback">{tour.fallback}</div>}>
             <Suspense fallback={<LoadingGauge />}><EngineStage reduced={reduced} mode={mode} inspect={inspect} debugZones={debugZones} /></Suspense>
-          </LoadBoundary>}
+          </AssetBoundary>}
         </div>
         <div className="engine-tools">
           <div className="engine-modes" role="radiogroup" aria-label={tour.modesLabel}>

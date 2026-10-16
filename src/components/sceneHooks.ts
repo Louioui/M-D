@@ -2,6 +2,19 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { frameQuality } from '../lib/frameQuality';
 
+/** Render-target pixels have no CPU backing image. Refresh one-shot studio
+ * captures after Three restores the context, while keeping scene objects alive. */
+export function useGraphicsRecovery() {
+  const canvas = useThree(state => state.gl.domElement);
+  const [generation, setGeneration] = useState(0);
+  useEffect(() => {
+    const restore = () => setGeneration(value => value + 1);
+    canvas.addEventListener('webglcontextrestored', restore);
+    return () => canvas.removeEventListener('webglcontextrestored', restore);
+  }, [canvas]);
+  return generation;
+}
+
 /** Demand rendering continues only while this canvas is visible and the tab is active. */
 export function useSceneActivity(reduced: boolean) {
   const canvas = useThree(state => state.gl.domElement);

@@ -14,7 +14,7 @@ import { prepareEngineMaterials } from '../lib/engineMaterials.ts';
 import type { InspectionMode } from '../lib/inspection.ts';
 import { engineHud } from '../lib/engineHud.ts';
 import type { EngineAssets } from '../lib/assetLoader.ts';
-import { useFrameGovernor, useSceneActivity } from './sceneHooks';
+import { useFrameGovernor, useGraphicsRecovery, useSceneActivity } from './sceneHooks';
 
 // White-balanced warm key, neutral rim and cool fill, calibrated against the reference.
 const KELVIN_4500 = '#fff0e1', KELVIN_5600 = '#ffefe5', KELVIN_7000_NAVY = '#8ea7d1';
@@ -76,6 +76,7 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
   useEffect(() => prepared.dispose, [prepared]);
   useEffect(() => { sendFraming(prepared.framing); }, [prepared]);
   const { visible, invalidate } = useSceneActivity(reduced);
+  const recovery = useGraphicsRecovery();
   const setDpr = useThree(state => state.setDpr);
   const animating = useRef(false);
   const level = useFrameGovernor(!reduced, animating);
@@ -170,9 +171,11 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
   return <>
     <StudioRig mode={mode} shadowLevel={level} />
     <Environment resolution={256} frames={1}>
-      <Lightformer intensity={2} color="#fff0de" position={[0, 4, 3]} scale={[6, 2, 1]} />
-      <Lightformer intensity={1} color="#b5c8e8" position={[-4, 1, 1]} rotation={[0, Math.PI / 2, 0]} scale={[2, 6, 1]} />
-      <Lightformer intensity={3} position={[3, 2, -3]} rotation={[0, -Math.PI / 4, 0]} scale={[1, 5, 1]} />
+      <group name={`Engine reflection capture ${recovery}`}>
+        <Lightformer intensity={2} color="#fff0de" position={[0, 4, 3]} scale={[6, 2, 1]} />
+        <Lightformer intensity={1} color="#b5c8e8" position={[-4, 1, 1]} rotation={[0, Math.PI / 2, 0]} scale={[2, 6, 1]} />
+        <Lightformer intensity={3} position={[3, 2, -3]} rotation={[0, -Math.PI / 4, 0]} scale={[1, 5, 1]} />
+      </group>
     </Environment>
     <group name="EngineTourModel" scale={ENGINE_SCALE}><primitive object={prepared.model} /></group>
     <group ref={stage} name="EngineTurntable">

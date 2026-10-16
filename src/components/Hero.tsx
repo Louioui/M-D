@@ -6,6 +6,7 @@ import { SHOP } from '../shop.ts';
 import ShopStatus from './ShopStatus';
 import LanguageToggle from './LanguageToggle';
 import { BadgeFallback } from './BadgeFallback';
+import AssetBoundary from './AssetBoundary';
 
 const BadgeStage = lazy(() => import('./BadgeStage'));
 
@@ -43,7 +44,9 @@ export default function Hero({ reduced, onBook, logo, logoSlot, back, front }: H
       {/* Midground WebGL plane (z-10, 1×). */}
       <div className="hero-logo-slot" ref={logoSlot}>
         <div className="hero-logo" ref={logo}>
-          <Suspense fallback={<BadgeFallback />}><BadgeStage reduced={reduced} /></Suspense>
+          <AssetBoundary name="Logo" fallback={<BadgeFallback />}>
+            <Suspense fallback={<BadgeFallback />}><BadgeStage reduced={reduced} /></Suspense>
+          </AssetBoundary>
         </div>
       </div>
       {/* Foreground HUD plane (z-20, 1.35×). */}

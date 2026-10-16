@@ -30,7 +30,9 @@ export function classifyDevice(s: DeviceSignals): TierProfile {
   const tier: DeviceTier = phone ? 'phone' : compact ? 'tablet' : 'desktop';
   return {
     tier,
-    engineUrl: compact ? '/models/engine-rebuilt-mobile.glb' : '/models/engine-rebuilt-studio.glb',
+    // Public model files retain readable names; revisioning refreshes visitors
+    // who already cached the earlier geometry before a new Site deployment.
+    engineUrl: compact ? '/models/engine-rebuilt-mobile.glb?v=detail-2' : '/models/engine-rebuilt-studio.glb?v=detail-2',
     detailSize: compact ? 512 : 2048,
     dpr: tier === 'phone' ? [1, 1.25] : tier === 'tablet' ? [1, 1.5] : [1, 2],
     shadows: !compact,

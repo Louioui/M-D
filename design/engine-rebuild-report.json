@@ -1,7 +1,7 @@
 [
   {
     "tier": "studio",
-    "removedSoftTriangles": 188799,
+    "removedSoftTriangles": 211321,
     "components": [
       {
         "name": "Head | cast cam carrier",
@@ -184,13 +184,98 @@
         "nonManifoldEdges": 0
       },
       {
-        "name": "Acoustic cover | sealed lower rim",
-        "vertices": 224,
+        "name": "Acoustic cover | seated lower rim",
+        "vertices": 323,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Acoustic cover | faceted molded shell",
-        "vertices": 288,
+        "name": "Acoustic cover | contoured molded shell",
+        "vertices": 386,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | neck",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | recessed rubber collar",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | grip cap",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.002",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.003",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.004",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.005",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.006",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.007",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.008",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.009",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.010",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.011",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | raised oil-can mark",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | raised spout",
+        "vertices": 96,
         "nonManifoldEdges": 0
       },
       {
@@ -204,38 +289,38 @@
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount",
+        "name": "Cover | compressed rubber locating mount",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount.001",
+        "name": "Cover | compressed rubber locating mount.001",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount.002",
+        "name": "Cover | compressed rubber locating mount.002",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount.003",
+        "name": "Cover | compressed rubber locating mount.003",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
         "name": "Cover emblem | outer",
-        "vertices": 4616,
+        "vertices": 1928,
         "nonManifoldEdges": 0
       },
       {
         "name": "Cover emblem | cross",
-        "vertices": 4616,
+        "vertices": 1928,
         "nonManifoldEdges": 0
       },
       {
         "name": "Cover emblem | upright",
-        "vertices": 4616,
+        "vertices": 1928,
         "nonManifoldEdges": 0
       },
       {
@@ -339,6 +424,81 @@
         "nonManifoldEdges": 0
       },
       {
+        "name": "Throttle | cast aluminum body",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | machined inlet face",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | butterfly valve",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle",
+        "vertices": 192,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw.001",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator housing",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw.001",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | plug body",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | connector latch",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
         "name": "Intake mounting bolt",
         "vertices": 480,
         "nonManifoldEdges": 0
@@ -366,6 +526,21 @@
       {
         "name": "Flexplate | machined hub",
         "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | pressed concentric bead",
+        "vertices": 2048,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | pressed concentric bead.001",
+        "vertices": 2048,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | pressed concentric bead.002",
+        "vertices": 2048,
         "nonManifoldEdges": 0
       },
       {
@@ -469,6 +644,76 @@
         "nonManifoldEdges": 0
       },
       {
+        "name": "Water outlet | clean cast housing",
+        "vertices": 289,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | machined collar",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | fastener seat",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | fastener seat.001",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | fastener seat.002",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | formed return elbow",
+        "vertices": 400,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | cast web",
+        "vertices": 72,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | cast web.001",
+        "vertices": 72,
+        "nonManifoldEdges": 0
+      },
+      {
         "name": "Line crimp ferrule",
         "vertices": 512,
         "nonManifoldEdges": 0
@@ -500,6 +745,306 @@
       },
       {
         "name": "Harness | separate locking tab",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 1",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 1",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 2",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 2",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 3",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 3",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 4",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 4",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | retaining saddle",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | retaining saddle.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw.001",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | formed EPDM hose",
+        "vertices": 784,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | spring clamp",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | clamp ears",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | spring clamp.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | clamp ears.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | core plug counterbore",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | dished core plug",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | cast vertical web",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | core plug counterbore.001",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | dished core plug.001",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | cast vertical web.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | core plug counterbore.002",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | dished core plug.002",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | cast vertical web.002",
         "vertices": 96,
         "nonManifoldEdges": 0
       },
@@ -577,8 +1122,141 @@
         "name": "Timing cover bolt 06 washer",
         "vertices": 512,
         "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | continuous perimeter gasket",
+        "vertices": 240,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | stepped cast backing",
+        "vertices": 240,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.003",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.004",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.004",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.004",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.005",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.005",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.005",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | cast reinforcement rib",
+        "vertices": 130,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | cast reinforcement rib.001",
+        "vertices": 130,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | exposed locating stud",
+        "vertices": 192,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | stud thread crest",
+        "vertices": 1086,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | exposed locating stud.001",
+        "vertices": 192,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | stud thread crest.001",
+        "vertices": 1086,
+        "nonManifoldEdges": 0
       }
     ],
+    "assembly": {
+      "coverToHeadGap": 0.014709532260894775
+    },
     "webGroups": [
       {
         "name": "MD | satin cast alloy",
@@ -601,19 +1279,19 @@
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | polished rigid steel line",
+        "name": "MD | connector latch",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | connector latch",
+        "name": "MD | polished rigid steel line",
         "nonManifoldEdges": 0
       }
     ],
-    "bytes": 8575336
+    "bytes": 8905580
   },
   {
     "tier": "mobile",
-    "removedSoftTriangles": 89228,
+    "removedSoftTriangles": 99402,
     "components": [
       {
         "name": "Head | cast cam carrier",
@@ -796,13 +1474,98 @@
         "nonManifoldEdges": 0
       },
       {
-        "name": "Acoustic cover | sealed lower rim",
-        "vertices": 224,
+        "name": "Acoustic cover | seated lower rim",
+        "vertices": 323,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Acoustic cover | faceted molded shell",
-        "vertices": 288,
+        "name": "Acoustic cover | contoured molded shell",
+        "vertices": 386,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | neck",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | recessed rubber collar",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | grip cap",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.002",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.003",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.004",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.005",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.006",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.007",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.008",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.009",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.010",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | molded grip.011",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | raised oil-can mark",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Oil filler | raised spout",
+        "vertices": 96,
         "nonManifoldEdges": 0
       },
       {
@@ -816,38 +1579,38 @@
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount",
+        "name": "Cover | compressed rubber locating mount",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount.001",
+        "name": "Cover | compressed rubber locating mount.001",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount.002",
+        "name": "Cover | compressed rubber locating mount.002",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
-        "name": "Cover | rubber locating mount.003",
+        "name": "Cover | compressed rubber locating mount.003",
         "vertices": 512,
         "nonManifoldEdges": 0
       },
       {
         "name": "Cover emblem | outer",
-        "vertices": 4616,
+        "vertices": 1928,
         "nonManifoldEdges": 0
       },
       {
         "name": "Cover emblem | cross",
-        "vertices": 4616,
+        "vertices": 1928,
         "nonManifoldEdges": 0
       },
       {
         "name": "Cover emblem | upright",
-        "vertices": 4616,
+        "vertices": 1928,
         "nonManifoldEdges": 0
       },
       {
@@ -951,6 +1714,81 @@
         "nonManifoldEdges": 0
       },
       {
+        "name": "Throttle | cast aluminum body",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | machined inlet face",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | butterfly valve",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle",
+        "vertices": 192,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw.001",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | spindle screw washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator housing",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw.001",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | actuator screw washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | plug body",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle | connector latch",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
         "name": "Intake mounting bolt",
         "vertices": 480,
         "nonManifoldEdges": 0
@@ -978,6 +1816,21 @@
       {
         "name": "Flexplate | machined hub",
         "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | pressed concentric bead",
+        "vertices": 2048,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | pressed concentric bead.001",
+        "vertices": 2048,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | pressed concentric bead.002",
+        "vertices": 2048,
         "nonManifoldEdges": 0
       },
       {
@@ -1081,6 +1934,76 @@
         "nonManifoldEdges": 0
       },
       {
+        "name": "Water outlet | clean cast housing",
+        "vertices": 289,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | machined collar",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | fastener seat",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | fastener seat.001",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | fastener seat.002",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | socket bolt washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | formed return elbow",
+        "vertices": 400,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | cast web",
+        "vertices": 72,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Water outlet | cast web.001",
+        "vertices": 72,
+        "nonManifoldEdges": 0
+      },
+      {
         "name": "Line crimp ferrule",
         "vertices": 512,
         "nonManifoldEdges": 0
@@ -1112,6 +2035,306 @@
       },
       {
         "name": "Harness | separate locking tab",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 1 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 1",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 1",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 1.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 2 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 2",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 2",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 2.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 3 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 3",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 3",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 3.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | seated barrel",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | seal",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Injector 4 | lock",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness branch 4",
+        "vertices": 250,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | injector seat 4",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.-1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.-1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.1",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | flange bolt 4.1 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | retaining saddle",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | retaining saddle.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw.001",
+        "vertices": 336,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | saddle screw washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | formed EPDM hose",
+        "vertices": 784,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | spring clamp",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | clamp ears",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | spring clamp.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Breather | clamp ears.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | core plug counterbore",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | dished core plug",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | cast vertical web",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | core plug counterbore.001",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | dished core plug.001",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | cast vertical web.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | core plug counterbore.002",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | dished core plug.002",
+        "vertices": 384,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Block | cast vertical web.002",
         "vertices": 96,
         "nonManifoldEdges": 0
       },
@@ -1189,8 +2412,141 @@
         "name": "Timing cover bolt 06 washer",
         "vertices": 512,
         "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | continuous perimeter gasket",
+        "vertices": 240,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | stepped cast backing",
+        "vertices": 240,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.003",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.004",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.004",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.004",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | seated bolt boss.005",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket.005",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | flange socket washer.005",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | cast reinforcement rib",
+        "vertices": 130,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | cast reinforcement rib.001",
+        "vertices": 130,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | exposed locating stud",
+        "vertices": 192,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | stud thread crest",
+        "vertices": 1086,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | exposed locating stud.001",
+        "vertices": 192,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | stud thread crest.001",
+        "vertices": 1086,
+        "nonManifoldEdges": 0
       }
     ],
+    "assembly": {
+      "coverToHeadGap": 0.014709532260894775
+    },
     "webGroups": [
       {
         "name": "MD | satin cast alloy.001",
@@ -1213,14 +2569,14 @@
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | polished rigid steel line.001",
+        "name": "MD | connector latch.001",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | connector latch.001",
+        "name": "MD | polished rigid steel line.001",
         "nonManifoldEdges": 0
       }
     ],
-    "bytes": 4740816
+    "bytes": 4891916
   }
 ]

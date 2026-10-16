@@ -122,8 +122,9 @@ const SURFACE = /* glsl */`
     engineHeight = engineZones.x * tri.r + engineZones.y * lathe + engineZones.z * tri.b + engineZones.w * mix(0.5, tri.r, 0.3) + engineChrome * 0.5;
     roughnessFactor += ((tri.r - 0.5) * 0.12 * engineZones.x + (tri.b - 0.5) * 0.1 * engineZones.z) * uDetail;
   }
-  float zoneRough = engineZones.x * 0.55 + engineZones.y * 0.33 + engineZones.z * 0.68 + engineZones.w * 0.29 + engineChrome * 0.22;
+  float zoneRough = engineZones.x * 0.50 + engineZones.y * 0.31 + engineZones.z * 0.50 + engineZones.w * 0.34 + engineChrome * 0.20;
   if (uSurface == 6) zoneRough = 0.85;
+  if (uSurface == 7) zoneRough = 0.58;
   float zoneMetal = engineZones.x * 0.82 + engineZones.y * 0.94 + engineZones.z * 0.015 + engineZones.w * 0.90 + engineChrome;
   // Keep 28% of the authored roughness variation so baked wear still reads.
   roughnessFactor = clamp(mix(roughnessFactor, zoneRough, 0.72), 0.04, 1.0);
@@ -135,7 +136,10 @@ const BUMP = /* glsl */`
 if (uDetail > 0.0) {
   float footprint = max(length(dFdx(vEnginePos)), length(dFdy(vEnginePos)));
   float fade = 1.0 - smoothstep(0.004, 0.012, footprint);
-  float micro = (engineHeight - 0.5) * 0.0011 * uDetail * fade;
+  // Foundry grain has more relief than molded polymer; ground steel stays fine.
+  // A shared large bump amplitude made the plastic read like rough foam.
+  float relief = dot(engineZones, vec4(0.0008, 0.00012, 0.00024, 0.00016)) + engineChrome * 0.00006;
+  float micro = (engineHeight - 0.5) * relief * uDetail * fade;
   vec3 sigmaX = dFdx(-vViewPosition), sigmaY = dFdy(-vViewPosition);
   vec3 r1 = cross(sigmaY, normal), r2 = cross(normal, sigmaX);
   float determinant = dot(sigmaX, r1);

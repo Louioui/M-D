@@ -40,6 +40,7 @@ test('rebuilt engine retains explicit mechanical finishes and compact phone geom
   const [desktop,mobile] = await Promise.all(['engine-rebuilt-studio','engine-rebuilt-mobile'].map(inspect));
   const count = item => item.json.meshes.reduce((n,mesh)=>n+mesh.primitives.reduce((sum,p)=>sum+item.json.accessors[p.indices].count/3,0),0);
   assert.ok(count(mobile)<count(desktop)*.6,'Phone must use substantially fewer triangles');
+  assert.ok(count(desktop)<500_000 && count(mobile)<240_000,'Geometry must remain within the rendering budgets');
   assert.ok(desktop.buffer.length<9_500_000 && mobile.buffer.length<5_000_000,'Rebuilt assets must stay within budgets');
   for(const {json} of [desktop,mobile]) {
     const surfaces=json.nodes.filter(n=>n.extras?.mdRebuilt).map(n=>n.extras.mdSurface);
@@ -53,9 +54,13 @@ test('rebuilt engine retains explicit mechanical finishes and compact phone geom
   }
   const report=JSON.parse(await fs.readFile(new URL('../design/engine-rebuild-report.json',import.meta.url),'utf8'));
   for(const tier of report){
-    assert.ok(tier.components.length>=73);
+    assert.ok(tier.components.length>=200);
     assert.ok(tier.components.every(c=>c.nonManifoldEdges===0),'New parts must have closed manifold edges before export');
     assert.ok(tier.components.some(c=>c.name.includes('120 beveled starter teeth')));
+    for(const part of ['Oil filler | grip cap','Throttle | butterfly valve','Harness branch 1','Breather | spring clamp','Timing | stud thread crest']) {
+      assert.ok(tier.components.some(c=>c.name.startsWith(part)),`Missing modeled assembly: ${part}`);
+    }
+    assert.ok(tier.assembly.coverToHeadGap>0 && tier.assembly.coverToHeadGap<.025,'The cover must sit close to the head without intersecting it');
     assert.ok(tier.webGroups.every(g=>g.nonManifoldEdges===0),'Mobile reduction must preserve closed hardware');
   }
 });

@@ -1,0 +1,14 @@
+[
+  {
+    "source": "../M&D3dmodel.glb",
+    "target": "logo.glb",
+    "originalBytes": 47994708,
+    "optimizedBytes": 1455916
+  },
+  {
+    "source": "../EngineM&D.glb",
+    "target": "engine.glb",
+    "originalBytes": 211497724,
+    "optimizedBytes": 2119972
+  }
+]

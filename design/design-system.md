@@ -20,4 +20,4 @@ M&D MULTI-SERVICE; Services; The difference; Find us; Book a service; HARD WORK.
 2. The engine is the supplied model, with its original surface textures; the generic conceptual engine render is not substituted.
 3. The customer-requested conversion is a slide-over vault, rather than the inline form depicted in the concept. The form typography, fields, palette and actions follow the same system.
 4. A compact service accordion and an address/hours/map section complete the navigation and actual conversion flow.
-5. Copy avoids testimonials, certifications and guarantees. The 4.6★ / 90+ Google rating is owner-supplied and links to the live listing. Engine readouts are labelled SIM.
+5. Copy avoids testimonials, certifications and guarantees. The 4.6★ / 90+ Google rating is owner-supplied and links to the live listing. Tour copy speaks to the customer's situation (warning light, needing the car for work, the bill, dealership fatigue); readouts state shop promises, not measurements.

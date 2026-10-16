@@ -122,7 +122,7 @@ export default function App() {
     <main id="main">
       <Hero reduced={reduced} onBook={() => openBooking()} logo={logo} logoSlot={heroSlot} back={heroBack} front={heroFront} />
       <ServicesSection service={service} onSelect={setService} onBook={openBooking} />
-      <EngineShowcase reduced={reduced} onBook={() => openBooking()} />
+      <EngineShowcase reduced={reduced} onBook={openBooking} />
       <ProofLocation />
       <BookingTerminal ref={firstField} service={service} onService={setService} reduced={reduced} />
     </main>

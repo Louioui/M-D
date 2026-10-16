@@ -12,6 +12,8 @@ interface Chapter {
   text: string;
   cta: string;
   readout: readonly string[];
+  /** Service pre-selected in the booking terminal by this stop's button. */
+  service: ServiceKey;
 }
 
 const en = {
@@ -55,8 +57,8 @@ const en = {
     } satisfies Record<ServiceKey, { label: string; text: string }>,
   },
   tour: {
-    topline: 'WHY HIRE US',
-    section: 'Why hire us: four views under the hood',
+    topline: 'WHAT DO YOU NEED RIGHT NOW?',
+    section: 'What you need right now: four situations we handle every day',
     scrollNote: 'SCROLL TO TURN THE ENGINE',
     prev: 'Previous engine view', next: 'Next engine view', continue: 'Continue to shop location',
     chaptersLabel: 'Engine tour chapters',
@@ -69,12 +71,24 @@ const en = {
     fallback: 'Your engine. In good hands.',
     canvasLabel: 'Interactive four-zone engine tour',
     restoring: 'RESTORING 3D…',
-    sim: 'SIM',
+    tag: 'M&D',
     chapters: [
-      { short: 'Diagnostics', part: 'CYLINDER HEAD & VALVE COVER', focus: 'TOP END', hook: ['No Guessing.', 'Master-Level Diagnostics.'], text: 'Anyone can swap parts. David knows the ins and outs of your engine down to the millimeter, fixing the real problem the first time.', cta: 'Tell us what’s wrong', readout: ['COMPRESSION: 195 PSI', 'TOLERANCE: ±0.002mm'] },
-      { short: 'All makes', part: 'COMPOSITE INTAKE MANIFOLD', focus: 'INTAKE RUNNERS', hook: ['All Makes. All Models.', 'Zero Shortcuts.'], text: 'From daily-driver Toyotas and Hondas to heavy-duty trucks and European rides like Mercedes-Benz, we treat every intake, sensor, and seal like our own family is driving it.', cta: 'Talk to your mechanic', readout: ['4-RUNNER INTAKE', 'SEALS: INSPECTED'] },
-      { short: 'Honest work', part: 'VVT TIMING ASSEMBLY', focus: 'VVT ACTUATOR', hook: ['Real Hard Work.', 'No Dealership Rip-Offs.'], text: 'You don’t pay for a luxury waiting room here. You pay for honest, blue-collar mechanical perfection from a family-owned shop.', cta: 'Get an honest quote', readout: ['VVT TIMING HOUSING', 'TARGET LOCKED'] },
-      { short: 'Family shop', part: 'FLEXPLATE & RING GEAR', focus: 'FLYWHEEL', hook: ['Built on Family & Word-of-Mouth', '(4.6★ on Google).'], text: 'David & Edith built M&D Multi-Service on pure grit and trust. When your car leaves our bay, it leaves solid, safe, and road-ready.', cta: 'Meet your mechanics', readout: ['CRANKSHAFT TORQUE SPEC: VERIFIED'] },
+      { short: 'Warning light', part: 'CYLINDER HEAD & VALVE COVER', focus: 'TOP END', service: 'diagnostics',
+        hook: ['Check-engine light on?', 'Find out what it really is.'],
+        text: 'A light, a noise, a smell, a shake. Tell us what you’re noticing. David tracks down the real cause before anything gets replaced, so you pay for the fix, not for guesses.',
+        cta: 'Tell us what’s happening', readout: ['SYMPTOM → ROOT CAUSE', 'NO GUESSWORK PARTS'] },
+      { short: 'Back to work', part: 'COMPOSITE INTAKE MANIFOLD', focus: 'INTAKE RUNNERS', service: 'diagnostics',
+        hook: ['Need your car for work?', 'We keep you in the loop.'],
+        text: 'Your car gets you to the job, the kids to school and the family where it needs to go. We tell you straight how long the work will take and keep you posted while it’s in the bay.',
+        cta: 'Ask how soon we can look', readout: ['DAILY DRIVERS · WORK TRUCKS', 'STRAIGHT TIMELINES'] },
+      { short: 'Fair price', part: 'VVT TIMING ASSEMBLY', focus: 'VVT ACTUATOR', service: 'engine',
+        hook: ['Worried about the bill?', 'No work without your OK.'],
+        text: 'We explain what we found in plain words and give you the price before we start. No surprise add-ons, no dealership upsell, no paying for a fancy waiting room.',
+        cta: 'Get an honest quote', readout: ['PRICE BEFORE WORK', 'YOUR APPROVAL FIRST'] },
+      { short: 'Trusted shop', part: 'FLEXPLATE & RING GEAR', focus: 'FLYWHEEL', service: 'other',
+        hook: ['Done with dealerships?', 'Meet your family mechanics.'],
+        text: 'Toyota, Honda, heavy-duty truck or Mercedes-Benz, David & Edith treat it like their own family is driving it. That’s why Boyle Heights gives us 4.6★ across 90+ Google reviews.',
+        cta: 'Meet David & Edith', readout: ['4.6★ · 90+ GOOGLE REVIEWS', 'ALL MAKES & MODELS'] },
     ] satisfies Chapter[] as Chapter[],
   },
   proof: {
@@ -153,8 +167,8 @@ const es: Copy = {
     },
   },
   tour: {
-    topline: 'POR QUÉ ELEGIRNOS',
-    section: 'Por qué elegirnos: cuatro vistas bajo el cofre',
+    topline: '¿QUÉ NECESITA AHORA MISMO?',
+    section: 'Lo que necesita ahora mismo: cuatro situaciones que resolvemos a diario',
     scrollNote: 'DESLICE PARA GIRAR EL MOTOR',
     prev: 'Vista anterior del motor', next: 'Siguiente vista del motor', continue: 'Continuar a la ubicación del taller',
     chaptersLabel: 'Capítulos del recorrido del motor',
@@ -167,12 +181,24 @@ const es: Copy = {
     fallback: 'Su motor. En buenas manos.',
     canvasLabel: 'Recorrido interactivo del motor en cuatro zonas',
     restoring: 'RESTAURANDO 3D…',
-    sim: 'SIM',
+    tag: 'M&D',
     chapters: [
-      { short: 'Diagnóstico', part: 'CULATA Y TAPA DE VÁLVULAS', focus: 'PARTE SUPERIOR', hook: ['Sin adivinar.', 'Diagnóstico de nivel experto.'], text: 'Cualquiera cambia piezas. David conoce su motor por dentro y por fuera, al milímetro, y arregla el problema real desde la primera vez.', cta: 'Cuéntenos qué pasa', readout: ['COMPRESIÓN: 195 PSI', 'TOLERANCIA: ±0.002mm'] },
-      { short: 'Todas las marcas', part: 'MÚLTIPLE DE ADMISIÓN', focus: 'CONDUCTOS DE ADMISIÓN', hook: ['Todas las marcas. Todos los modelos.', 'Sin atajos.'], text: 'Desde Toyotas y Hondas de diario hasta camionetas de trabajo pesado y autos europeos como Mercedes-Benz, tratamos cada admisión, sensor y sello como si lo manejara nuestra propia familia.', cta: 'Hable con su mecánico', readout: ['ADMISIÓN DE 4 CONDUCTOS', 'SELLOS: INSPECCIONADOS'] },
-      { short: 'Trabajo honesto', part: 'SINCRONIZACIÓN VVT', focus: 'ACTUADOR VVT', hook: ['Trabajo duro de verdad.', 'Sin abusos de agencia.'], text: 'Aquí no paga una sala de espera de lujo. Paga por trabajo mecánico honesto y bien hecho, de un taller familiar.', cta: 'Pida una cotización honesta', readout: ['CARCASA DE SINCRONIZACIÓN VVT', 'OBJETIVO FIJADO'] },
-      { short: 'Taller familiar', part: 'VOLANTE Y CORONA', focus: 'VOLANTE', hook: ['Hecho en familia y de boca en boca', '(4.6★ en Google).'], text: 'David y Edith levantaron M&D Multi-Service a puro esfuerzo y confianza. Cuando su carro sale de nuestro taller, sale firme, seguro y listo para el camino.', cta: 'Conozca a sus mecánicos', readout: ['TORQUE DEL CIGÜEÑAL: VERIFICADO'] },
+      { short: 'Luz encendida', part: 'CULATA Y TAPA DE VÁLVULAS', focus: 'PARTE SUPERIOR', service: 'diagnostics',
+        hook: ['¿Se prendió el check engine?', 'Sepa qué es de verdad.'],
+        text: 'Una luz, un ruido, un olor, una vibración. Cuéntenos qué está notando. David encuentra la causa real antes de cambiar cualquier pieza, para que pague por el arreglo, no por adivinanzas.',
+        cta: 'Cuéntenos qué pasa', readout: ['SÍNTOMA → CAUSA REAL', 'SIN PIEZAS A CIEGAS'] },
+      { short: 'A trabajar', part: 'MÚLTIPLE DE ADMISIÓN', focus: 'CONDUCTOS DE ADMISIÓN', service: 'diagnostics',
+        hook: ['¿Necesita su carro para trabajar?', 'Lo mantenemos al tanto.'],
+        text: 'Su carro lo lleva al trabajo, a los niños a la escuela y a la familia a donde tiene que ir. Le decimos claro cuánto va a tardar el trabajo y le avisamos cómo va mientras está en el taller.',
+        cta: 'Pregunte qué tan pronto lo vemos', readout: ['CARROS DE DIARIO · CAMIONETAS DE TRABAJO', 'TIEMPOS CLAROS'] },
+      { short: 'Precio justo', part: 'SINCRONIZACIÓN VVT', focus: 'ACTUADOR VVT', service: 'engine',
+        hook: ['¿Le preocupa la cuenta?', 'Nada se hace sin su OK.'],
+        text: 'Le explicamos lo que encontramos en palabras claras y le damos el precio antes de empezar. Sin cargos sorpresa, sin ventas de agencia, sin pagar por una sala de espera de lujo.',
+        cta: 'Pida una cotización honesta', readout: ['PRECIO ANTES DEL TRABAJO', 'PRIMERO SU APROBACIÓN'] },
+      { short: 'De confianza', part: 'VOLANTE Y CORONA', focus: 'VOLANTE', service: 'other',
+        hook: ['¿Cansado de las agencias?', 'Conozca a sus mecánicos de familia.'],
+        text: 'Toyota, Honda, camioneta de trabajo pesado o Mercedes-Benz: David y Edith lo tratan como si lo manejara su propia familia. Por eso Boyle Heights nos da 4.6★ en más de 90 reseñas de Google.',
+        cta: 'Conozca a David y Edith', readout: ['4.6★ · 90+ RESEÑAS EN GOOGLE', 'TODAS LAS MARCAS Y MODELOS'] },
     ],
   },
   proof: {

@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Hand, ScanLine } from 'lucide-react';
 import { publishTourProgress } from '../motion';
 import { useLanguage } from '../i18n';
+import type { ServiceKey } from '../copy.ts';
 import { engineHud } from '../lib/engineHud.ts';
 import { INSPECTION_MODES, type InspectionMode } from '../lib/inspection.ts';
 import LoadingGauge from './LoadingGauge';
@@ -21,7 +22,7 @@ class LoadBoundary extends Component<{ fallback: ReactNode; children: ReactNode 
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; onBook: () => void }) {
+export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; onBook: (service: ServiceKey) => void }) {
   const { copy } = useLanguage();
   const tour = copy.tour;
   const section = useRef<HTMLElement>(null), stageRef = useRef<HTMLDivElement>(null), visual = useRef<HTMLDivElement>(null);
@@ -156,16 +157,16 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
       <svg className="engine-leader" aria-hidden="true"><path ref={leader} /></svg>
       <div ref={reticle} className="engine-reticle" aria-hidden="true">
         <span className="engine-reticle-ring" /><span className="engine-reticle-dot" />
-        <span className="engine-readout mono"><b>{tour.sim}</b>{chapter.readout.join(' | ')}</span>
+        <span className="engine-readout mono"><b>{tour.tag}</b>{chapter.readout.join(' | ')}</span>
       </div>
 
       <article ref={card} className={`engine-hud-card side-${side}`} aria-live="polite">
         <div ref={cardInner} className="engine-card-inner">
           <p className="engine-part mono">0{active + 1} / {chapter.focus}</p>
-          <p className="engine-card-readout mono" aria-hidden="true"><b>{tour.sim}</b>{chapter.readout.join(' | ')}</p>
+          <p className="engine-card-readout mono" aria-hidden="true"><b>{tour.tag}</b>{chapter.readout[0]}</p>
           <h2 className="engine-hook"><Words text={chapter.hook[0]} /><br /><span><Words text={chapter.hook[1]} /></span></h2>
           <p className="engine-story">{chapter.text}</p>
-          <button className="engine-tour-cta" onClick={onBook}>{chapter.cta}<ArrowUpRight size={19} /></button>
+          <button className="engine-tour-cta" onClick={() => onBook(chapter.service)}>{chapter.cta}<ArrowUpRight size={19} /></button>
         </div>
       </article>
 

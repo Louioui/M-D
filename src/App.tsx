@@ -49,7 +49,6 @@ export default function App() {
       if (event.pointerType !== 'mouse') return;
       motion.pointerX = event.clientX / window.innerWidth * 2 - 1;
       motion.pointerY = event.clientY / window.innerHeight * 2 - 1;
-      motion.clientX = event.clientX; motion.clientY = event.clientY;
     };
     const orient = (event: DeviceOrientationEvent) => {
       if (!motion.gyroAllowed || motion.reduced) return;
@@ -60,7 +59,6 @@ export default function App() {
       const badge = logo.current;
       if (next === docked || !badge) return;
       docked = next;
-      motion.docked = next;
       const state = Flip.getState(badge);
       (next ? navSlot : heroSlot).current?.appendChild(badge);
       badge.classList.toggle('docked', next);

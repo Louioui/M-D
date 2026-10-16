@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Environment, Lightformer } from '@react-three/drei';
 import type { Group } from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -7,7 +7,7 @@ import { motion } from '../motion';
 import { BADGE_IN, BADGE_OUT } from '../lib/cameraSolver.ts';
 import { badgeChannel } from '../lib/motionClient.ts';
 import { useGraphicsRecovery, useSceneActivity } from './sceneHooks';
-import { createLiquidState, prepareLiquidBadge, stepLiquid } from '../lib/liquidBadge.ts';
+import { prepareBadgeFinish, sheenAt } from '../lib/badgeFinish.ts';
 import { deviceProfile } from '../lib/deviceTier.ts';
 import { loadBadgeDetail } from '../lib/assetLoader.ts';
 
@@ -22,13 +22,11 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
     if (!gear) throw new Error('The articulated logo is missing its gear assembly.');
     return { badge, gear };
   }, [gltf]);
-  const finish = useMemo(() => prepareLiquidBadge(badge,deviceProfile().clearcoat),[badge]);
+  const finish = useMemo(() => prepareBadgeFinish(badge,deviceProfile().clearcoat),[badge]);
   useEffect(() => finish.dispose,[finish]);
-  const liquid = useRef(createLiquidState());
   const tilt = useRef<Group>(null);
   const { visible, invalidate } = useSceneActivity(reduced);
   const recovery = useGraphicsRecovery();
-  const gl = useThree(state => state.gl);
   // Forged-steel atlas + curvature/cavity land after first paint; upgrade in place.
   useEffect(() => {
     let alive = true;
@@ -36,30 +34,12 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
     loadBadgeDetail().then(texture => { if (alive) { finish.setDetail(texture); invalidate(); } });
     return () => { alive = false; };
   }, [finish, invalidate]);
-  // Canvas rect for the cursor ripple: re-measured lazily after scroll/resize/dock
-  // flips, never on every frame.
-  const rect = useRef({ left: 0, bottom: 0, dirty: true });
-  useEffect(() => {
-    const dirty = () => { rect.current.dirty = true; };
-    const observer = new ResizeObserver(dirty); observer.observe(gl.domElement);
-    window.addEventListener('scroll', dirty, { passive: true });
-    window.addEventListener('resize', dirty, { passive: true });
-    return () => { observer.disconnect(); window.removeEventListener('scroll', dirty); window.removeEventListener('resize', dirty); };
-  }, [gl]);
-
-  useFrame((_, frameDelta) => {
+  useFrame(({ clock }, frameDelta) => {
     if (!tilt.current || !visible.current || document.hidden) return;
     const delta = Math.min(frameDelta, .1); // No large jump after tab suspension.
-    const energy = stepLiquid(liquid.current,motion.pointerX,motion.pointerY,motion.velocity,delta,reduced);
-    finish.update(energy,liquid.current.phase,motion.pointerX,motion.pointerY,reduced);
-    // Ripples only in the hero (not while docked in the navbar) and only while moving.
-    const rippling = !reduced && !motion.docked && !motion.coarse && energy > .002;
-    if (rippling) {
-      const box = rect.current;
-      if (box.dirty) { const r = gl.domElement.getBoundingClientRect(); box.left = r.left; box.bottom = r.bottom; box.dirty = false; }
-      const dpr = gl.getPixelRatio();
-      finish.ripple((motion.clientX - box.left) * dpr, (box.bottom - motion.clientY) * dpr, 150 * dpr, Math.min(1, energy * 2.2));
-    } else finish.ripple(-1e4, -1e4, 150, 0);
+    // A timed glint sweeps across the emblem every SHEEN_PERIOD seconds; the
+    // cursor never drives the finish (only the existing tilt follows it).
+    finish.setSheen(reduced ? -1 : sheenAt(clock.elapsedTime));
     motion.velocity *= Math.exp(-delta * 6);
     const input = badgeChannel.input;
     input[BADGE_IN.velocity] = motion.velocity;

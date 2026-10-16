@@ -1,14 +1,22 @@
-import { BufferAttribute, DataTexture, MathUtils, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3, type Object3D, type Texture } from 'three';
+import { BufferAttribute, DataTexture, Mesh, MeshPhysicalMaterial, MeshStandardMaterial, type Object3D, type Texture } from 'three';
 import { inject } from './shaderInject.ts';
 
-export const createLiquidState = () => ({ x: 0, y: 0, energy: 0, phase: 0 });
-export function stepLiquid(state: ReturnType<typeof createLiquidState>, x: number, y: number, scroll: number, dt: number, reduced: boolean) {
-  dt = Math.min(.1, Math.max(0, dt));
-  const speed = Math.min(1, Math.hypot(x-state.x,y-state.y) / Math.max(.008,dt) * .12 + Math.abs(scroll)*.00008);
-  state.x=x; state.y=y;
-  state.energy = reduced ? 0 : MathUtils.damp(state.energy,speed,speed > state.energy ? 10 : 4,dt);
-  state.phase = reduced ? 0 : (state.phase + dt * (.18+state.energy*.8)) % (Math.PI*2);
-  return state.energy;
+/** Seconds between automatic glints, how long one sweep takes, and the first one after load. */
+export const SHEEN_PERIOD = 12;
+export const SHEEN_SECONDS = 1.6;
+export const SHEEN_FIRST = 2.5;
+
+/**
+ * Progress (0..1, eased) of the light sweep at `elapsed` seconds, or -1 when
+ * no sweep is running. The glint runs on a clock, never from the cursor.
+ */
+export function sheenAt(elapsed: number) {
+  const t = elapsed - SHEEN_FIRST;
+  if (t < 0) return -1;
+  const phase = t % SHEEN_PERIOD;
+  if (phase >= SHEEN_SECONDS) return -1;
+  const x = phase / SHEEN_SECONDS;
+  return x * x * (3 - 2 * x);
 }
 
 const VERTEX_PARS = /* glsl */`
@@ -26,13 +34,10 @@ vBadgeCurv = aCurvature;
 vBadgeCav = aCavity;`;
 
 const FRAGMENT_PARS = /* glsl */`
-uniform float uLiquid;
-uniform float uPhase;
+uniform float uSheen;        // sweep progress 0..1, < 0 when idle
 uniform float uDetail;
 uniform float uZones;
 uniform sampler2D uDetailMap;
-uniform vec3 uRipple;        // xy: cursor in drawing-buffer px, z: ring radius px
-uniform float uRippleStrength;
 varying vec3 vBadgePos;
 varying vec3 vBadgeNormal;
 varying float vBadgeCurv;
@@ -40,8 +45,7 @@ varying float vBadgeCav;
 float badgeSteel;   // Zone A: forged brushed steel
 float badgeEnamel;  // Zone B: crimson enamel insets
 float badgeChip;    // enamel chipped back to bare steel at laser-cut edges
-float badgeForged;  // forged-steel height (0.5 = polished plane)
-float badgeRing;    // cursor ripple at this pixel`;
+float badgeForged;  // forged-steel height (0.5 = polished plane)`;
 
 // PAINTED is the original atlas (lettering, plate, wrenches); the separately
 // modeled gear parts are all steel, so only the atlas needs a hue mask.
@@ -71,7 +75,7 @@ const ZONES = /* glsl */`
   badgeSteel = max(badgeSteel, badgeChip);
   // Scratch grooves darken and burnished lips brighten the steel only.
   diffuseColor.rgb *= 1.0 + (badgeForged - 0.5) * 0.8 * badgeSteel;
-  // Deep occlusion in the stamped recesses: lettering, socket and gear roots.
+  // Occlusion where the geometry is recessed: gear roots, socket, plate edges.
   diffuseColor.rgb *= 1.0 - clamp(vBadgeCav, 0.0, 1.0) * 0.55 * uDetail;
 }`;
 
@@ -85,29 +89,16 @@ const SURFACE = /* glsl */`
   // Zone B 0.10 / 0.25 enamel; its gloss comes from the clearcoat lobe.
   roughnessFactor = mix(roughnessFactor, 0.25 + (0.5 - badgeForged) * 0.1, badgeEnamel);
   metalnessFactor = mix(metalnessFactor, 0.1, badgeEnamel);
-  // Liquid state: the steel flows toward a mirror while the pointer moves.
-  roughnessFactor = clamp(roughnessFactor * (1.0 - uLiquid * badgeSteel * 0.54), 0.06, 1.0);
-  metalnessFactor = max(metalnessFactor, badgeSteel * 0.92);
 }`;
 
 const NORMALS = /* glsl */`
-{
-  if (uDetail > 0.0) {
-    float footprint = max(length(dFdx(vBadgePos)), length(dFdy(vBadgePos)));
-    float micro = (badgeForged - 0.5) * 0.0005 * uDetail * badgeSteel * (1.0 - smoothstep(0.004, 0.01, footprint));
-    vec3 sigmaX = dFdx(-vViewPosition), sigmaY = dFdy(-vViewPosition);
-    vec3 r1 = cross(sigmaY, normal), r2 = cross(normal, sigmaX);
-    float determinant = dot(sigmaX, r1);
-    normal = normalize(abs(determinant) * normal - sign(determinant) * (dFdx(micro) * r1 + dFdy(micro) * r2));
-  }
-  // Surface-tension ripple: concentric rings spread from the cursor in screen
-  // space (no raycast on the hero), plus a faint global swell while moving.
-  vec2 toPointer = gl_FragCoord.xy - uRipple.xy;
-  float rr = length(toPointer) / max(uRipple.z, 1.0);
-  badgeRing = sin(rr * 22.0 - uPhase * 9.0) * exp(-rr * rr * 2.2) * uRippleStrength;
-  vec2 radial = toPointer / max(length(toPointer), 1e-3);
-  normal = normalize(normal + vec3(radial * badgeRing * 0.24, 0.0) * badgeSteel);
-  normal = normalize(normal + vec3(sin(vViewPosition.y*14.0+uPhase), cos(vViewPosition.x*11.0-uPhase), 0.0) * uLiquid * badgeSteel * 0.03);
+if (uDetail > 0.0) {
+  float footprint = max(length(dFdx(vBadgePos)), length(dFdy(vBadgePos)));
+  float micro = (badgeForged - 0.5) * 0.0005 * uDetail * badgeSteel * (1.0 - smoothstep(0.004, 0.01, footprint));
+  vec3 sigmaX = dFdx(-vViewPosition), sigmaY = dFdy(-vViewPosition);
+  vec3 r1 = cross(sigmaY, normal), r2 = cross(normal, sigmaX);
+  float determinant = dot(sigmaX, r1);
+  normal = normalize(abs(determinant) * normal - sign(determinant) * (dFdx(micro) * r1 + dFdy(micro) * r2));
 }`;
 
 const LOBES = /* glsl */`
@@ -115,45 +106,33 @@ const LOBES = /* glsl */`
   material.clearcoat *= badgeEnamel;
 #endif`;
 
-// A reflection of a place that doesn't exist: a synthwave sunset over a neon
-// garage grid, visible only while the steel is "liquid", then gone.
+// Timed glint: a soft diagonal band of light crosses the emblem left to right
+// (object space, so it travels with the badge's tilt). Brightest on steel,
+// a gentler pass over enamel, nothing on the back faces.
 const OUTPUT = /* glsl */`
-{
-  vec3 viewDir = normalize(vViewPosition);
-  vec3 r = reflect(-viewDir, normal);
-  vec3 neon;
-  if (r.y < 0.0) {
-    vec2 g = r.xz / max(-r.y, 0.06) * 1.4 + vec2(0.0, uPhase * 0.8);
-    vec2 f = abs(fract(g) - 0.5) / max(fwidth(g), vec2(1e-3));
-    float line = 1.0 - min(min(f.x, f.y), 1.0);
-    neon = mix(vec3(0.03, 0.0, 0.07), vec3(0.0, 0.95, 1.0) * 1.7, line) * smoothstep(0.0, 0.18, -r.y);
-  } else {
-    vec3 sky = mix(vec3(1.0, 0.38, 0.08), vec3(0.5, 0.02, 0.42), smoothstep(0.0, 0.55, r.y));
-    float sunDisc = 1.0 - smoothstep(0.26, 0.28, length(vec2(r.x, r.y - 0.2)));
-    float bands = step(0.35 - r.y * 1.2, fract(r.y * 26.0));
-    neon = sky * 0.75 + sunDisc * bands * vec3(1.7, 0.7, 0.2);
-  }
-  float facing = 0.35 + 0.65 * pow(1.0 - abs(dot(normal, viewDir)), 1.5);
-  // Neon pools in the rings around the cursor; the rest of the steel only glints.
-  float pooled = abs(badgeRing) * 2.2 + uLiquid * 0.4;
-  float hit = clamp(pooled * badgeSteel * facing, 0.0, 0.8);
-  outgoingLight = mix(outgoingLight, outgoingLight * 0.4 + neon, hit);
-  if (uZones > 0.5) {
-    outgoingLight = badgeSteel * vec3(0.6) + badgeEnamel * vec3(1.0, 0.05, 0.1) + badgeChip * vec3(1.0, 0.85, 0.1)
-      + (1.0 - max(badgeSteel, badgeEnamel)) * vec3(0.1, 0.25, 1.0);
-    outgoingLight = mix(outgoingLight, vec3(0.1, 0.9, 0.2), clamp(vBadgeCav, 0.0, 1.0) * 0.8);
-  }
+if (uSheen >= 0.0) {
+  float along = dot(vBadgePos.xy, vec2(0.8, 0.6));
+  float centre = mix(-1.5, 1.5, uSheen);
+  float band = exp(-pow((along - centre) / 0.11, 2.0)) + 0.35 * exp(-pow((along - centre) / 0.3, 2.0));
+  float facing = clamp(normal.z, 0.0, 1.0);
+  float finish = badgeSteel + badgeEnamel * 0.45 + (1.0 - max(badgeSteel, badgeEnamel)) * 0.2;
+  float fade = sin(3.14159265 * uSheen);
+  outgoingLight += vec3(1.0, 0.96, 0.9) * band * finish * facing * fade * 0.75;
+}
+if (uZones > 0.5) {
+  outgoingLight = badgeSteel * vec3(0.6) + badgeEnamel * vec3(1.0, 0.05, 0.1) + badgeChip * vec3(1.0, 0.85, 0.1)
+    + (1.0 - max(badgeSteel, badgeEnamel)) * vec3(0.1, 0.25, 1.0);
+  outgoingLight = mix(outgoingLight, vec3(0.1, 0.9, 0.2), clamp(vBadgeCav, 0.0, 1.0) * 0.8);
 }`;
 
 /** Instance-owned materials; never dispose the cached GLTF's shared textures. */
-export function prepareLiquidBadge(badge: Object3D, highQuality: boolean) {
+export function prepareBadgeFinish(badge: Object3D, highQuality: boolean) {
   const materials = new Map<MeshStandardMaterial, MeshPhysicalMaterial>();
   const flat = new DataTexture(new Uint8Array([128, 128, 128, 128]), 1, 1);
   flat.needsUpdate = true;
   const uniforms = {
-    uLiquid: { value: 0 }, uPhase: { value: 0 }, uDetail: { value: 0 }, uZones: { value: 0 },
+    uSheen: { value: -1 }, uDetail: { value: 0 }, uZones: { value: 0 },
     uDetailMap: { value: flat as Texture },
-    uRipple: { value: new Vector3(-1e4, -1e4, 140) }, uRippleStrength: { value: 0 },
   };
   badge.traverse(object => {
     if (!(object instanceof Mesh)) return;
@@ -185,7 +164,7 @@ export function prepareLiquidBadge(badge: Object3D, highQuality: boolean) {
         fragment = inject(fragment, '#include <opaque_fragment>', OUTPUT, 'before');
         shader.vertexShader = vertex; shader.fragmentShader = fragment;
       };
-      material.customProgramCacheKey = () => `md-mercury-2-${painted}-${highQuality}`;
+      material.customProgramCacheKey = () => `md-badge-sheen-1-${painted}-${highQuality}`;
       materials.set(original,material);
       return material;
     };
@@ -193,17 +172,8 @@ export function prepareLiquidBadge(badge: Object3D, highQuality: boolean) {
   });
   return {
     materials: [...materials.values()], uniforms,
-    update(energy: number, phase: number, x: number, y: number, reduced: boolean) {
-      uniforms.uLiquid.value=energy; uniforms.uPhase.value=phase;
-      for (const material of materials.values()) {
-        material.envMapRotation.set(reduced ? 0 : y*.16,reduced ? 0 : x*.32+energy*.18,0);
-        if(highQuality) { material.anisotropy=.12+energy*.45; material.anisotropyRotation=reduced ? 0 : x*.8; }
-      }
-    },
-    /** Cursor in drawing-buffer pixels (origin bottom-left); strength 0 hides the rings. */
-    ripple(x: number, y: number, radius: number, strength: number) {
-      uniforms.uRipple.value.set(x, y, radius); uniforms.uRippleStrength.value = strength;
-    },
+    /** Sweep progress from sheenAt(); -1 hides the glint. */
+    setSheen(progress: number) { uniforms.uSheen.value = progress; },
     /** Worker-generated atlas (alpha = forged steel); null keeps the neutral surface. */
     setDetail(texture: Texture | null) { uniforms.uDetailMap.value = texture ?? flat; uniforms.uDetail.value = texture ? 1 : 0; },
     setZones(enabled: boolean) { uniforms.uZones.value = enabled ? 1 : 0; },

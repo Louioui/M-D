@@ -5,7 +5,7 @@ import { frameAssembly } from './lib/frameAssembly.ts';
 import { createEngineRig } from './lib/engineRig.ts';
 import { splitAt } from './lib/splitTimeline.ts';
 import { prepareEngineMaterials } from './lib/engineMaterials.ts';
-import { createLiquidState, prepareLiquidBadge, stepLiquid } from './lib/liquidBadge.ts';
+import { prepareBadgeFinish, sheenAt, SHEEN_FIRST, SHEEN_PERIOD, SHEEN_SECONDS } from './lib/badgeFinish.ts';
 import { createShockTrigger, SHOCK_SECONDS, shockAt, shouldShock } from './lib/shockwave.ts';
 import { inject } from './lib/shaderInject.ts';
 import { FIRING_HZ, rmsLevel } from './lib/engineAudio.ts';
@@ -129,26 +129,30 @@ test('render-frame safety fit prevents clipping while a worker still has the pre
   const position=camera.position.clone();assert.equal(frameAssembly(camera,bounds,1.4,.8,.86),0);assert.deepEqual(camera.position,position);
 });
 
-test('liquid badge reacts to velocity, settles, respects reduced motion and owns its materials',()=>{
-  const state=createLiquidState();
-  stepLiquid(state,1,0,0,1/60,false);assert.ok(state.energy>0 && state.energy<=1);
-  for(let i=0;i<240;i++)stepLiquid(state,1,0,0,1/60,false);
-  assert.ok(state.energy<.00001,'A held pointer must stop adding energy');
-  stepLiquid(state,1,0,2000,1/60,false);assert.ok(state.energy>0);
-  stepLiquid(state,1,0,2000,1/60,true);assert.equal(state.energy,0);assert.equal(state.phase,0);
+test('badge glint runs on a clock every SHEEN_PERIOD seconds, never from the cursor',()=>{
+  assert.equal(sheenAt(0),-1,'no glint during the first moments after load');
+  assert.equal(sheenAt(SHEEN_FIRST),0);
+  assert.ok(sheenAt(SHEEN_FIRST+SHEEN_SECONDS/2)>.4 && sheenAt(SHEEN_FIRST+SHEEN_SECONDS/2)<.6);
+  assert.equal(sheenAt(SHEEN_FIRST+SHEEN_SECONDS+.01),-1,'idle between sweeps');
+  assert.equal(sheenAt(SHEEN_FIRST+SHEEN_PERIOD),0,'repeats every period');
+  assert.ok(SHEEN_PERIOD>=10 && SHEEN_PERIOD<=15,'requested 10–15 s cadence');
+  let last=-1;for(let t=0;t<=SHEEN_SECONDS;t+=.05){const v=sheenAt(SHEEN_FIRST+t);if(v<0)continue;assert.ok(v>=last && v<=1);last=v;}
+});
+
+test('badge finish owns its materials and upgrades in place when worker data lands',()=>{
   const source=fixture(),original=source.children[0].material;
-  const finish=prepareLiquidBadge(source,true);
+  const finish=prepareBadgeFinish(source,true);
   assert.notEqual(source.children[0].material,original);
   assert.ok('PHYSICAL' in finish.materials[0].defines,'Physical specular/IOR shader features survive the Standard material copy');
-  finish.update(.8,1,.5,.3,false);assert.equal(finish.uniforms.uLiquid.value,.8);assert.ok(finish.materials[0].anisotropy>.12);
-  finish.update(0,0,.5,.3,true);assert.equal(finish.materials[0].envMapRotation.y,0);
+  assert.equal(finish.uniforms.uSheen.value,-1);
+  finish.setSheen(.5);assert.equal(finish.uniforms.uSheen.value,.5);
   const geometry=source.children[0].geometry,count=geometry.getAttribute('position').count;
   assert.equal(geometry.getAttribute('aCurvature').count,count,'neutral curvature until the worker lands');
   assert.equal(finish.uniforms.uDetail.value,0);
   const atlas=new DataTexture();finish.setDetail(atlas);assert.equal(finish.uniforms.uDetailMap.value,atlas);assert.equal(finish.uniforms.uDetail.value,1);
   finish.setDetail(null);assert.equal(finish.uniforms.uDetail.value,0);
-  finish.ripple(10,20,150,.5);assert.equal(finish.uniforms.uRippleStrength.value,.5);
   const supplied=new Float32Array(count).fill(.7);geometry.setAttribute('aCurvature',new BufferAttribute(supplied,1));
-  prepareLiquidBadge(source,false).dispose();assert.equal(geometry.getAttribute('aCurvature').array,supplied,'worker data on shared geometry is never overwritten');
-  finish.dispose();
+  prepareBadgeFinish(source,false).dispose();assert.equal(geometry.getAttribute('aCurvature').array,supplied,'worker data on shared geometry is never overwritten');
+  let originalDisposed=false;original.addEventListener('dispose',()=>originalDisposed=true);
+  finish.dispose();assert.equal(originalDisposed,false);
 });

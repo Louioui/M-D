@@ -44,7 +44,7 @@ const en = {
   services: {
     topline: ['01 / WHAT WE DO', 'ALL MAKES. ALL MODELS.'],
     title: ['Built for', 'the everyday.'],
-    text: 'Daily-driver Toyotas and Hondas, heavy-duty trucks, European rides like Mercedes-Benz. Pick what you need and we’ll carry it into your booking.',
+    text: 'From oil changes to engine repairs, we help keep your car or truck running right. Choose a service below and tell us what’s going on.',
     pick: 'Choose a service',
     request: 'Book this service',
     items: {
@@ -156,7 +156,7 @@ const es: Copy = {
   services: {
     topline: ['01 / LO QUE HACEMOS', 'TODAS LAS MARCAS. TODOS LOS MODELOS.'],
     title: ['Hecho para', 'el día a día.'],
-    text: 'Toyotas y Hondas de diario, camionetas de trabajo pesado, autos europeos como Mercedes-Benz. Elija lo que necesita y lo pasamos a su solicitud.',
+    text: 'Desde cambios de aceite hasta reparaciones de motor, ayudamos a que su auto o camioneta siga funcionando bien. Elija un servicio y cuéntenos qué está pasando.',
     pick: 'Elija un servicio',
     request: 'Agendar este servicio',
     items: {

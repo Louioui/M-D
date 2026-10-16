@@ -47,7 +47,7 @@ const BookingTerminal = forwardRef<HTMLInputElement, BookingTerminalProps>(funct
           <h2 id="booking-title">{text.title[0]}<br /><span>{text.title[1]}</span></h2>
           <p>{text.text}</p>
           <a className="booking-call" href={`tel:${SHOP.phone}`}><Phone size={16} />{text.call} {SHOP.phoneDisplay}</a>
-          <PixelDrive reduced={reduced} />
+          <PixelDrive />
         </div>
         <form ref={form} className="booking-form" onSubmit={event => event.preventDefault()} noValidate={false}>
           <label>{text.name} <span className="sr-only">({text.required})</span>

@@ -120,6 +120,8 @@ const en = {
     note: 'Your messaging app opens with your request. Send it there to reach the shop. Appointments are confirmed when we reply.',
     invalid: 'Add your name, vehicle year, make, and model first.',
     required: 'required',
+    pixelBubble: 'I love working with Mercedes-Benz!',
+    pixelLabel: 'Pixel-art David driving a silver Mercedes-Benz back and forth, saying: I love working with Mercedes-Benz!',
   },
   footer: { tagline: 'FAMILY-OWNED. BOYLE HEIGHTS, LOS ANGELES.', email: 'Email David & Edith', instagram: 'M&D on Instagram' },
 };
@@ -230,6 +232,8 @@ const es: Copy = {
     note: 'Su app de mensajes se abre con su solicitud. Envíela desde ahí para comunicarse con el taller. La cita se confirma cuando le respondamos.',
     invalid: 'Primero escriba su nombre y el año, marca y modelo de su vehículo.',
     required: 'obligatorio',
+    pixelBubble: '¡Me encanta trabajar con Mercedes-Benz!',
+    pixelLabel: 'David en pixel art manejando un Mercedes-Benz plateado de ida y vuelta, diciendo: ¡Me encanta trabajar con Mercedes-Benz!',
   },
   footer: { tagline: 'NEGOCIO FAMILIAR. BOYLE HEIGHTS, LOS ÁNGELES.', email: 'Escríbale a David y Edith', instagram: 'M&D en Instagram' },
 };

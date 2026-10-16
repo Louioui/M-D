@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowUpRight, Contact, Mail, MessageSquare, Phone } from 'lucide-react';
 import { useLanguage } from '../i18n';
 import { SERVICE_KEYS, type ServiceKey } from '../copy.ts';
+import PixelDrive from './PixelDrive';
 import { SHOP, VCARD_HREF, bookingLink, bookingMessage, type BookingFields } from '../shop.ts';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -46,6 +47,7 @@ const BookingTerminal = forwardRef<HTMLInputElement, BookingTerminalProps>(funct
           <h2 id="booking-title">{text.title[0]}<br /><span>{text.title[1]}</span></h2>
           <p>{text.text}</p>
           <a className="booking-call" href={`tel:${SHOP.phone}`}><Phone size={16} />{text.call} {SHOP.phoneDisplay}</a>
+          <PixelDrive reduced={reduced} />
         </div>
         <form ref={form} className="booking-form" onSubmit={event => event.preventDefault()} noValidate={false}>
           <label>{text.name} <span className="sr-only">({text.required})</span>

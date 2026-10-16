@@ -5,7 +5,7 @@ import { sampleEnginePath } from '../enginePath.ts';
 import { cameraProfile } from './deviceTier.ts';
 
 /** Float32 message layouts shared by the worker and its client. */
-export const ENGINE_IN = { channel: 0, dt: 1, progress: 2, aspect: 3, viewportAspect: 4, leanX: 5, leanY: 6, mobile: 7, reduced: 8, length: 9 } as const;
+export const ENGINE_IN = { channel: 0, dt: 1, progress: 2, aspect: 3, viewportAspect: 4, leanX: 5, leanY: 6, mobile: 7, reduced: 8, split: 9, length: 10 } as const;
 export const ENGINE_OUT = { channel: 0, px: 1, py: 2, pz: 3, qx: 4, qy: 5, qz: 6, qw: 7, fov: 8, progress: 9, settled: 10, tx: 11, ty: 12, tz: 13, length: 14 } as const;
 export const BADGE_IN = { channel: 0, dt: 1, velocity: 2, pointerX: 3, pointerY: 4, reduced: 5, length: 6 } as const;
 export const BADGE_OUT = { channel: 0, gear: 1, tiltX: 2, tiltY: 3, settled: 4, length: 5 } as const;
@@ -46,6 +46,11 @@ export function solveEngine(state: EngineSolverState, input: Float32Array, out: 
 
   const profile = cameraProfile(input[ENGINE_IN.viewportAspect]);
   sampleEnginePath(state.progress, position, target, mobile);
+  // Follow the raised cover in split view and look down into the assembly.
+  // Otherwise the low flywheel stop wastes half the phone canvas below it.
+  const split = reduced ? 0 : MathUtils.clamp(input[ENGINE_IN.split] || 0,0,1) * (mobile ? .55 : 1);
+  target.y += split * .62;
+  position.y += split * 1.12;
   position.sub(target).multiplyScalar(profile.distanceScale).add(target);
   position.x += state.leanX;
   position.y += state.leanY;

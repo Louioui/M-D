@@ -2,12 +2,12 @@ import {
   Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3,
   type IUniform, type Object3D, type Texture, type WebGLProgramParametersWithUniforms,
 } from 'three';
-import { ENGINE_SCALE } from '../enginePath.ts';
+import { createHeatUniforms, createPlasmaMaterial, HEAT_PARS, type HeatUniforms } from './plasmaMaterial.ts';
 
 import type { InspectionMode } from './inspection.ts';
 const MODE_INDEX: Record<InspectionMode | 'zones', number> = { studio: 0, cad: 1, spec: 2, zones: 3 };
 
-export interface EngineUniforms {
+export interface EngineUniforms extends HeatUniforms {
   uMode: IUniform<number>;
   uDetail: IUniform<number>;
   uDetailMap: IUniform<Texture>;
@@ -38,6 +38,7 @@ vEnginePos = position;
 vEngineNormal = objectNormal;
 vCurv = aCurvature;
 vCav = aCavity;
+vHeatWorld = (modelMatrix * vec4(position, 1.0)).xyz;
 vec3 flyOffset = position - uFlyCenter;
 vEngineRadial = (modelViewMatrix * vec4(flyOffset - dot(flyOffset, uFlyAxis) * uFlyAxis, 0.0)).xyz;`;
 
@@ -186,6 +187,7 @@ export interface EngineMaterialOptions { detailMap: Texture; clearcoat: boolean;
 export function prepareEngineMaterials(source: Object3D, options: EngineMaterialOptions) {
   const model = source.clone(true);
   const uniforms: EngineUniforms = {
+    ...createHeatUniforms(),
     uMode: { value: 0 },
     uDetail: { value: 1 },
     uDetailMap: { value: options.detailMap },
@@ -195,13 +197,9 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
     uFlyRadius: { value: FLYWHEEL.radius },
     uAniso: { value: options.clearcoat ? .22 : 0 },
   };
+  const plasma = createPlasmaMaterial(uniforms);
+  const solid = new Map<Mesh, Mesh['material']>();
   const materials = new Map<MeshStandardMaterial, MeshPhysicalMaterial>();
-  const supports: { direction: Vector3; point: Vector3; score: number }[] = [];
-  for (const x of [-1, 0, 1]) for (const y of [-1, 0, 1]) for (const z of [-1, 0, 1]) {
-    if (x || y || z) supports.push({ direction: new Vector3(x, y, z), point: new Vector3(), score: -Infinity });
-  }
-  const vertex = new Vector3();
-  model.updateMatrixWorld(true);
 
   const upgrade = (original: MeshStandardMaterial, surface: number) => {
     const existing = materials.get(original);
@@ -223,17 +221,17 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
     material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
       Object.assign(shader.uniforms, uniforms, { uSurface: { value: surface } });
       shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', `#include <common>\n${VERTEX_PARS}`)
+        .replace('#include <common>', `#include <common>\nvarying vec3 vHeatWorld;\n${VERTEX_PARS}`)
         .replace('#include <begin_vertex>', `#include <begin_vertex>\n${VERTEX_MAIN}`);
       shader.fragmentShader = shader.fragmentShader
-        .replace('#include <common>', `#include <common>\n${FRAGMENT_PARS}`)
+        .replace('#include <common>', `#include <common>\n${HEAT_PARS}\n${FRAGMENT_PARS}`)
         .replace('#include <color_fragment>', `#include <color_fragment>\n${ZONES}`)
         .replace('#include <metalnessmap_fragment>', `#include <metalnessmap_fragment>\n${SURFACE}`)
         .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n${BUMP}`)
         .replace('#include <lights_physical_fragment>', `#include <lights_physical_fragment>\n${LOBES}`)
-        .replace('#include <opaque_fragment>', `${OUTPUT}\n#include <opaque_fragment>`);
+        .replace('#include <opaque_fragment>', `${OUTPUT}\nfloat temperature = hoverHeat();\nvec3 hotSteel = mix(vec3(0.65,0.025,0.008), vec3(1.8,0.5,0.035), temperature);\noutgoingLight = mix(outgoingLight, hotSteel, temperature * 0.92);\n#include <opaque_fragment>`);
     };
-    material.customProgramCacheKey = () => `md-engine-rebuilt-v3-${options.clearcoat ? 'hq' : 'lite'}`;
+    material.customProgramCacheKey = () => `md-engine-thermal-v4-${surface}-${options.clearcoat ? 'hq' : 'lite'}`;
     material.needsUpdate = true;
     materials.set(original, material);
     return material;
@@ -241,29 +239,21 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
 
   model.traverse(object => {
     if (!(object instanceof Mesh)) return;
-    // Exact directional extrema give tighter framing than a bounding box; the
-    // camera solver only visits these 26 points per frame.
-    const positions = object.geometry.getAttribute('position');
-    for (let i = 0; i < positions.count; i++) {
-      vertex.fromBufferAttribute(positions, i).applyMatrix4(object.matrixWorld);
-      for (const support of supports) {
-        const score = vertex.dot(support.direction);
-        if (score > support.score) { support.score = score; support.point.copy(vertex); }
-      }
-    }
     const surface = Number(object.userData.mdSurface) || 0;
     const convert = (material: unknown) => material instanceof MeshStandardMaterial ? upgrade(material, surface) : material;
     object.material = Array.isArray(object.material) ? object.material.map(convert) : convert(object.material);
+    solid.set(object, object.material);
   });
 
-  const framing = new Float32Array(supports.length * 3);
-  supports.forEach((support, i) => support.point.multiplyScalar(ENGINE_SCALE).toArray(framing, i * 3));
   return {
     model,
     uniforms,
     materials: [...materials.values()],
-    framing,
+    plasma,
     setMode(mode: InspectionMode | 'zones') { uniforms.uMode.value = MODE_INDEX[mode]; },
-    dispose: () => materials.forEach(material => material.dispose()),
+    setXray(enabled: boolean) {
+      solid.forEach((material, mesh) => { mesh.material = enabled ? plasma : material; mesh.renderOrder = enabled ? 2 : 0; });
+    },
+    dispose: () => { materials.forEach(material => material.dispose()); plasma.dispose(); },
   };
 }

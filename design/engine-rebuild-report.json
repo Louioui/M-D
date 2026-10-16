@@ -4,6 +4,166 @@
     "removedSoftTriangles": 211321,
     "components": [
       {
+        "name": "Piston 1 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
         "name": "Head | cast cam carrier",
         "vertices": 176,
         "nonManifoldEdges": 0
@@ -1259,41 +1419,325 @@
     },
     "webGroups": [
       {
-        "name": "MD | satin cast alloy",
+        "name": "piston-1 | MD | satin cast alloy",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | precision satin flexplate steel",
+        "name": "piston-1 | MD | precision satin flexplate steel",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | gasket and ribbed conduit",
+        "name": "piston-2 | MD | satin cast alloy",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | molded graphite polymer",
+        "name": "piston-2 | MD | precision satin flexplate steel",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | dark zinc fastener heads",
+        "name": "piston-3 | MD | satin cast alloy",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | connector latch",
+        "name": "piston-3 | MD | precision satin flexplate steel",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | polished rigid steel line",
+        "name": "piston-4 | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "piston-4 | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | molded graphite polymer",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "cover | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "cover | MD | molded graphite polymer",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "cover | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | molded graphite polymer",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | connector latch",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "flywheel | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "flywheel | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | polished rigid steel line",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | polished rigid steel line",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "block | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "block | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | dark zinc fastener heads",
         "nonManifoldEdges": 0
       }
     ],
-    "bytes": 8905580
+    "bytes": 9061044
   },
   {
     "tier": "mobile",
     "removedSoftTriangles": 99402,
     "components": [
       {
+        "name": "Piston 1 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 1 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 2 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 3 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | crown",
+        "vertices": 256,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | hollow skirt",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | compression ring",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | compression ring.001",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | compression ring.002",
+        "vertices": 128,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | wrist pin",
+        "vertices": 48,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | connecting rod",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Piston 4 | big end",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
         "name": "Head | cast cam carrier",
         "vertices": 176,
         "nonManifoldEdges": 0
@@ -2549,34 +2993,158 @@
     },
     "webGroups": [
       {
-        "name": "MD | satin cast alloy.001",
+        "name": "piston-1 | MD | satin cast alloy",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | precision satin flexplate steel.001",
+        "name": "piston-1 | MD | precision satin flexplate steel",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | gasket and ribbed conduit.001",
+        "name": "piston-2 | MD | satin cast alloy",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | molded graphite polymer.001",
+        "name": "piston-2 | MD | precision satin flexplate steel",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | dark zinc fastener heads.001",
+        "name": "piston-3 | MD | satin cast alloy",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | connector latch.001",
+        "name": "piston-3 | MD | precision satin flexplate steel",
         "nonManifoldEdges": 0
       },
       {
-        "name": "MD | polished rigid steel line.001",
+        "name": "piston-4 | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "piston-4 | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | molded graphite polymer",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "valve | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "sump | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "cover | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "cover | MD | molded graphite polymer",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "cover | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | molded graphite polymer",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | connector latch",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "flywheel | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "flywheel | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "intake | MD | polished rigid steel line",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | polished rigid steel line",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "head | MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "block | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "block | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "timing | MD | dark zinc fastener heads",
         "nonManifoldEdges": 0
       }
     ],
-    "bytes": 4891916
+    "bytes": 4974212
   }
 ]

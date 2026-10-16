@@ -28,6 +28,13 @@
 .engine-inspect{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;background:#0d0f13d9;border:1px solid #8d99ae55;color:#dfe3ea;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:1.1px}
 .engine-inspect.is-active{border-color:#e63946;color:#ff8a92}
 .engine-inspect-hint{font-size:9px;color:#8d99ae;letter-spacing:1px}
+.engine-effects{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:25;display:flex;gap:6px;max-width:100%;padding:5px;background:#080d15e8;border:1px solid #8d99ae55;backdrop-filter:blur(10px)}
+.engine-effects button{min-height:38px;white-space:nowrap;padding:0 14px;border:1px solid #8d99ae45;background:#152033;color:#dce7f6;font:10px 'IBM Plex Mono',monospace;letter-spacing:1px}
+.engine-effects button[aria-pressed=true]{background:#b32636;border-color:#ff5a64;color:#fff;box-shadow:inset 0 0 18px #ff52602b}
+.engine-effects button:hover:not(:disabled){border-color:#f1f4fb;color:#fff}
+.engine-effects button:disabled,.engine-modes button:disabled{opacity:.45;cursor:default}
+.engine-effect-note{position:absolute;bottom:72px;left:0;right:0;z-index:24;pointer-events:none;text-align:center;color:#bdcce1;font-size:10px;letter-spacing:1px;text-shadow:0 2px 5px #000,0 0 12px #000;margin:0}
+.is-xray .engine-studio-light{background:radial-gradient(ellipse at 50% 65%,#bd183326,transparent 64%)}
 
 /* Reticle + leader are positioned by the render loop through transforms only. */
 .engine-leader{position:absolute;inset:0;width:100%;height:100%;z-index:14;pointer-events:none;overflow:visible}
@@ -105,6 +112,10 @@
   .engine-tools{left:0;right:0;flex-direction:row;justify-content:space-between;align-items:flex-start}
   .engine-inspect-hint{display:none}
   .engine-stage-canvas{top:56px}
+  .engine-effects{left:0;right:0;top:54px;bottom:auto;transform:none;justify-content:space-between;padding:0;background:#080d15;border:0;gap:5px}
+  .engine-effects button{min-height:44px;flex:1;padding:0 7px;font-size:9px;letter-spacing:.6px}
+  .engine-stage-canvas{top:104px}
+  .engine-effect-note{bottom:0;font-size:8px;line-height:1.4;letter-spacing:.3px;padding:4px 6px;background:#0d0f13e8}
   .engine-hud-card .engine-tour-cta{display:none}
   .engine-hud-card .engine-part{display:none} /* The top bar already names the part. */
   .engine-tour-footer{gap:6px;min-height:56px}

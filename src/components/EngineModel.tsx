@@ -15,6 +15,9 @@ import type { InspectionMode } from '../lib/inspection.ts';
 import { engineHud } from '../lib/engineHud.ts';
 import type { EngineAssets } from '../lib/assetLoader.ts';
 import { useFrameGovernor, useGraphicsRecovery, useSceneActivity } from './sceneHooks';
+import { createEngineRig } from '../lib/engineRig.ts';
+import { createPlasmaMaterial } from '../lib/plasmaMaterial.ts';
+import { useEngineHeat } from './useEngineHeat.ts';
 
 // White-balanced warm key, neutral rim and cool fill, calibrated against the reference.
 const KELVIN_4500 = '#fff0e1', KELVIN_5600 = '#ffefe5', KELVIN_7000_NAVY = '#8ea7d1';
@@ -65,17 +68,24 @@ interface EngineModelProps {
   reduced: boolean;
   mode: InspectionMode;
   inspect: boolean;
+  split: boolean;
+  xray: boolean;
+  heat: boolean;
   debugZones?: boolean;
 }
 
 const tmp = new Vector3();
 
-export default function EngineModel({ assets, reduced, mode, inspect, debugZones = false }: EngineModelProps) {
+export default function EngineModel({ assets, reduced, mode, inspect, split, xray, heat, debugZones = false }: EngineModelProps) {
   const profile = deviceProfile();
   const prepared = useMemo(() => prepareEngineMaterials(assets.gltf.scene, { detailMap: assets.detailMap, clearcoat: profile.clearcoat }), [assets, profile.clearcoat]);
+  const rig = useMemo(()=>createEngineRig(prepared.model),[prepared]);
+  const core = useMemo(()=>createPlasmaMaterial(prepared.uniforms,true),[prepared]);
+  useEffect(()=>()=>core.dispose(),[core]);
   useEffect(() => prepared.dispose, [prepared]);
-  useEffect(() => { sendFraming(prepared.framing); }, [prepared]);
   const { visible, invalidate } = useSceneActivity(reduced);
+  const updateHeat = useEngineHeat(prepared.model,prepared.uniforms,heat,reduced,visible);
+  const splitState = useRef({ amount: 0, framed: -1, mobile: false });
   const recovery = useGraphicsRecovery();
   const setDpr = useThree(state => state.setDpr);
   const animating = useRef(false);
@@ -87,9 +97,11 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
 
   useEffect(() => {
     prepared.model.traverse(object => {
-      if (object instanceof Mesh) { object.castShadow = profile.shadows && level < 2; object.receiveShadow = profile.shadows && level < 2; }
+      if (object instanceof Mesh) { object.castShadow = !xray && profile.shadows && level < 2; object.receiveShadow = !xray && profile.shadows && level < 2; }
     });
-  }, [prepared, profile.shadows, level]);
+  }, [prepared, profile.shadows, level, xray]);
+  useEffect(()=>{ prepared.setXray(xray); invalidate(); },[prepared,xray,invalidate]);
+  useEffect(()=>{ invalidate(); },[split,heat,reduced,invalidate]);
   useEffect(() => {
     prepared.setMode(debugZones ? 'zones' : mode);
     const env = RIG[mode][6];
@@ -134,6 +146,15 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
     if (!visible.current || document.hidden) return;
     const delta = Math.min(frameDelta, .1);
     const progress = reduced ? (chapterAt(motion.tour) + .3) / 4 : motion.tour; // Reduced motion snaps between stops.
+    const splitGoal = split && !reduced ? motion.split : 0;
+    const separation=splitState.current;
+    separation.amount = reduced ? 0 : separation.amount+(splitGoal-separation.amount)*(1-Math.exp(-delta*9));
+    if(Math.abs(separation.amount-splitGoal)<.0001)separation.amount=splitGoal;
+    const bounds=rig.apply(separation.amount,motion.mobile,xray);
+    if(Math.abs(separation.amount-separation.framed)>.001 || separation.mobile!==motion.mobile) {
+      sendFraming(bounds); separation.framed=separation.amount; separation.mobile=motion.mobile;
+    }
+    if(separation.amount!==splitGoal) {animating.current=true;invalidate();}
     let idle = false;
     if (!inspect) {
       const input = engineChannel.input;
@@ -150,6 +171,7 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
       input[ENGINE_IN.leanY] = leanY;
       input[ENGINE_IN.mobile] = motion.mobile ? 1 : 0;
       input[ENGINE_IN.reduced] = reduced ? 1 : 0;
+      input[ENGINE_IN.split] = separation.amount;
       engineChannel.push(delta);
       if (engineChannel.ready && camera instanceof PerspectiveCamera) {
         const out = engineChannel.latest, last = applied.current;
@@ -163,8 +185,14 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
     if (stage.current) stage.current.rotation.y = reduced ? 0 : -engineChannel.latest[ENGINE_OUT.progress] * Math.PI * .3;
     // Project the active inspection anchor to screen space for the DOM reticle + leader.
     camera.updateMatrixWorld();
-    tmp.copy(anchors[chapterAt(motion.tour)]).project(camera);
+    const chapter=chapterAt(motion.tour);
+    rig.offsetFor(['cover','intake','timing','flywheel'][chapter],tmp);
+    tmp.add(anchors[chapter]).project(camera);
     engineHud.place((tmp.x * .5 + .5) * size.width, (-tmp.y * .5 + .5) * size.height, tmp.z < 1 && Math.abs(tmp.x) < 1.2 && Math.abs(tmp.y) < 1.2);
+    if(updateHeat(camera,delta)) {animating.current=true;invalidate();}
+    prepared.plasma.uniforms.uTime.value = reduced ? 0 : clock.elapsedTime;
+    core.uniforms.uTime.value = reduced ? 0 : clock.elapsedTime;
+    if(xray && !reduced) {animating.current=true;invalidate();}
     if (idle) { animating.current = true; invalidate(); }
   });
 
@@ -178,6 +206,11 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
       </group>
     </Environment>
     <group name="EngineTourModel" scale={ENGINE_SCALE}><primitive object={prepared.model} /></group>
+    {xray && <group name="Illustrated crimson energy cores" scale={ENGINE_SCALE}>
+      {[-.375,-.125,.125,.375].map(x=><mesh key={x} position={[x,-.02,.02]} material={core} renderOrder={1}>
+        <cylinderGeometry args={[.064,.075,.42,16,1]} />
+      </mesh>)}
+    </group>}
     <group ref={stage} name="EngineTurntable">
       {profile.shadows && level < 2 && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.19, 0]} receiveShadow>
         <circleGeometry args={[1.25, 64]} /><shadowMaterial transparent opacity={.5} />

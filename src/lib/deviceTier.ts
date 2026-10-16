@@ -32,7 +32,7 @@ export function classifyDevice(s: DeviceSignals): TierProfile {
     tier,
     // Public model files retain readable names; revisioning refreshes visitors
     // who already cached the earlier geometry before a new Site deployment.
-    engineUrl: compact ? '/models/engine-rebuilt-mobile.glb?v=detail-2' : '/models/engine-rebuilt-studio.glb?v=detail-2',
+    engineUrl: compact ? '/models/engine-rebuilt-mobile.glb?v=kinetic-3' : '/models/engine-rebuilt-studio.glb?v=kinetic-3',
     detailSize: compact ? 512 : 2048,
     dpr: tier === 'phone' ? [1, 1.25] : tier === 'tablet' ? [1, 1.5] : [1, 2],
     shadows: !compact,

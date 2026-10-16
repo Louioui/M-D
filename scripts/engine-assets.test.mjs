@@ -44,8 +44,19 @@ test('rebuilt engine retains explicit mechanical finishes and compact phone geom
   assert.ok(desktop.buffer.length<9_500_000 && mobile.buffer.length<5_000_000,'Rebuilt assets must stay within budgets');
   for(const {json} of [desktop,mobile]) {
     const surfaces=json.nodes.filter(n=>n.extras?.mdRebuilt).map(n=>n.extras.mdSurface);
-    assert.deepEqual([...surfaces].sort((a,b)=>a-b),[1,2,3,4,5,6,7]);
-    assert.equal(json.meshes.length,8,'Hardware must be batched by finish');
+    assert.deepEqual([...new Set(surfaces)].sort((a,b)=>a-b),[1,2,3,4,5,6,7]);
+    assert.ok(json.meshes.length<=42,'Hardware must be batched by assembly and finish within the draw budget');
+    const assemblies=new Set(json.nodes.map(n=>n.extras?.mdAssembly));
+    for(const name of ['cover','valve','head','intake','timing','flywheel','sump','block','piston-1','piston-2','piston-3','piston-4'])assert.ok(assemblies.has(name),`Missing rigid assembly ${name}`);
+    for(const node of json.nodes.filter(n=>n.extras?.mdRebuilt)) {
+      assert.equal(node.extras.mdExplode.length,3);
+      assert.ok(node.extras.mdExplode.every(Number.isFinite));
+      if(node.extras.mdInternal){
+        assert.deepEqual(node.extras.mdLocalNormal,[0,1,0]);
+        assert.equal(node.extras.mdExplode[0],0);assert.equal(node.extras.mdExplode[2],0,'Pistons travel along their local crown normals');
+      }
+      assert.ok(!node.translation && !node.rotation && !node.scale,'Assembly travel is authored in the shared GLB coordinate frame');
+    }
     assert.ok(json.meshes.every(m=>m.primitives.every(p=>p.extensions?.KHR_draco_mesh_compression)));
     for(const node of json.nodes.filter(n=>n.extras?.mdRebuilt)){
       const p=json.meshes[node.mesh].primitives[0];

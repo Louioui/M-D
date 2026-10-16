@@ -149,6 +149,16 @@ def build_parts():
     fastener=material('MD | dark zinc fastener heads',(.18,.20,.23),.9,.29,4)
     chrome=material('MD | polished rigid steel line',(.65,.68,.72),1,.22,5)
     connector=material('MD | connector latch',(.16,.075,.025),.25,.58,7)
+    # Illustrative closed piston/rod assemblies for the cinematic split view.
+    # These are not an OEM internal teardown or a dimensional service model.
+    for i,x in enumerate([-.375,-.125,.125,.375]):
+        prefix=f'Piston {i+1} | '
+        cylinder(prefix+'crown',(x,.18,.02),.096,.065,alloy,'y',32,.001)
+        ring(prefix+'hollow skirt',(x,.10,.02),.095,.082,.09,alloy,'y',32,0)
+        for y in [.159,.176,.193]:ring(prefix+'compression ring',(x,y,.02),.098,.092,.004,steel,'y',32,0)
+        cylinder(prefix+'wrist pin',(x,.087,.02),.019,.17,steel,'z',24,0)
+        box(prefix+'connecting rod',(x,-.057,.02),(.038,.25,.026),steel,.003)
+        ring(prefix+'big end',(x,-.20,.02),.049,.027,.037,steel,'z',32,.001)
     # Defined upper head/cam carrier and lower sump replace the largest crumpled
     # casting patches. The owner's central block and external accessories remain.
     head=[(-.51,-.29),(.49,-.29),(.54,-.24),(.54,.23),(.47,.30),(-.48,.30),(-.54,.24),(-.54,-.23)]
@@ -346,6 +356,23 @@ def cut_soft_parts(base):
     if thumb:bpy.data.images.remove(thumb)
     return removed
 
+def assembly_for(part):
+    if part.startswith('Piston '):return 'piston-'+part.split()[1]
+    if part.startswith(('Acoustic cover','Cover','Oil filler')):return 'cover'
+    if part.startswith('Valve cover'):return 'valve'
+    if part.startswith(('Intake','Throttle','Injector','Fuel rail','Harness','Breather','Line crimp')):return 'intake'
+    if part.startswith(('Head','Water outlet')):return 'head'
+    if part.startswith(('Flexplate','Crank hub')):return 'flywheel'
+    if part.startswith('Timing'):return 'timing'
+    if part.startswith('Sump'):return 'sump'
+    return 'block'
+
+# Displacements in the exported glTF coordinate system, not Blender's Z-up.
+EXPLODE={'cover':(0,1.02,0),'valve':(0,.72,0),'head':(0,.42,0),
+    'intake':(-.32,0,.48),'flywheel':(.53,-.035,0),'timing':(.45,.07,-.13),
+    'sump':(0,-.23,0),'block':(0,0,0)}
+for i in range(1,5):EXPLODE[f'piston-{i}']=(0,.42+(i%2)*.06,0)
+
 tiers=os.environ.get('MD_ENGINE_TIERS','studio,mobile').split(',')
 if any(t not in ['studio','mobile'] for t in tiers):raise ValueError('Unknown engine tier')
 report_path=ROOT/'design/engine-rebuild-report.json'
@@ -354,7 +381,7 @@ for name in tiers:
     bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
     bpy.ops.import_scene.gltf(filepath=str(SOURCE_DIR/f'engine-{name}.glb'))
     base=max((o for o in bpy.context.scene.objects if o.type=='MESH'),key=lambda o:len(o.data.vertices))
-    base.name='Engine base | preserved casting and housings';base['mdRebuilt']=False
+    base.name='Engine base | preserved casting and housings';base['mdRebuilt']=False;base['mdAssembly']='block'
     removed=cut_soft_parts(base);build_parts()
     report={'tier':name,'removedSoftTriangles':removed,'components':[]}
     shell=bpy.data.objects['Acoustic cover | contoured molded shell']
@@ -362,6 +389,11 @@ for name in tiers:
     report['assembly']={'coverToHeadGap':min((shell.matrix_world@v.co).z for v in shell.data.vertices)-max((head.matrix_world@v.co).z for v in head.data.vertices)}
     for obj in list(bpy.context.scene.objects):
         if obj.type!='MESH' or not obj.get('mdRebuilt'):continue
+        assembly=assembly_for(obj.name)
+        obj['mdAssembly']=assembly;obj['mdExplode']=list(EXPLODE[assembly])
+        obj['mdInternal']=assembly.startswith('piston-')
+        # Rigid piston travel follows the crown's local outward normal.
+        if obj['mdInternal']:obj['mdLocalNormal']=[0,1,0]
         # Preserve broad machined faces under raking light instead of interpolating
         # small bevel normals across an entire drilled plate.
         bpy.context.view_layer.objects.active=obj
@@ -388,19 +420,19 @@ for name in tiers:
         bpy.ops.file.pack_all()
         (ROOT/'design/source').mkdir(exist_ok=True)
         bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'design/source/engine-detail-master.blend'),compress=True)
-    # Batch repeated hardware by explicit finish. Parts stay disconnected solids,
-    # while the web scene pays only one draw per material group, not per bolt.
+    # Batch by mechanical assembly AND finish: polymer intake runners must not
+    # move with the polymer cover. Repeated hardware still costs one draw/batch.
     groups={}
     for obj in list(bpy.context.scene.objects):
-        if obj.type=='MESH' and obj.get('mdRebuilt'):groups.setdefault(obj.data.materials[0].name,[]).append(obj)
-    for mat,objects in groups.items():
+        if obj.type=='MESH' and obj.get('mdRebuilt'):groups.setdefault((obj['mdAssembly'],obj.data.materials[0].name),[]).append(obj)
+    for (assembly,mat),objects in groups.items():
         bpy.ops.object.select_all(action='DESELECT')
         for obj in objects:obj.select_set(True)
         bpy.context.view_layer.objects.active=objects[0]
         if len(objects)>1:bpy.ops.object.join()
-        objects[0].name=mat;objects[0]['mdRebuilt']=True
+        objects[0].name=assembly+' | '+mat;objects[0]['mdRebuilt']=True
         if name=='mobile':
-            mod=objects[0].modifiers.new('Mobile silhouette-preserving reduction','DECIMATE');mod.ratio=.42
+            mod=objects[0].modifiers.new('Mobile silhouette-preserving reduction','DECIMATE');mod.ratio=.38
             bpy.ops.object.modifier_apply(modifier=mod.name)
             normal=objects[0].modifiers.new('Mobile weighted normals','WEIGHTED_NORMAL');normal.keep_sharp=True;normal.weight=75
             bpy.ops.object.modifier_apply(modifier=normal.name)

@@ -7,6 +7,7 @@ import { useLanguage } from '../i18n';
 import type { ServiceKey } from '../copy.ts';
 import { engineHud } from '../lib/engineHud.ts';
 import { INSPECTION_MODES, type InspectionMode } from '../lib/inspection.ts';
+import { splitAt } from '../lib/splitTimeline.ts';
 import LoadingGauge from './LoadingGauge';
 import Words from './Words';
 import AssetBoundary from './AssetBoundary';
@@ -28,6 +29,7 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
   const [near, setNear] = useState(false);
   const [mode, setMode] = useState<InspectionMode>('studio');
   const [inspect, setInspect] = useState(false);
+  const [split, setSplit] = useState(false), [xray, setXray] = useState(false), [heat, setHeat] = useState(false);
   const chapter = tour.chapters[active];
   const side = active % 2 ? 'right' : 'left';
 
@@ -67,10 +69,10 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
 
   // Smoothed playhead follows native scroll; React state changes only at chapter boundaries.
   useEffect(() => {
-    const playhead = { value: 0 };
+    const playhead = { value: 0, split: 0 };
     const paint = () => {
       const p = playhead.value;
-      publishTourProgress(p);
+      publishTourProgress(p, playhead.split);
       const index = Math.min(3, Math.floor(p * 4));
       if (index !== activeRef.current) { activeRef.current = index; setActive(index); }
       bars.current.forEach((bar, i) => { if (bar) gsap.set(bar, { scaleX: Math.min(1, Math.max(0, p * 4 - i)), transformOrigin: 'left' }); });
@@ -83,14 +85,15 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
         engineHud.dirty();
       }
     };
-    const tween = gsap.fromTo(playhead, { value: 0 }, {
-      value: 1, ease: 'none', onUpdate: paint,
+    const tween = gsap.timeline({
+      onUpdate: paint,
       scrollTrigger: {
         trigger: section.current, start: 'top top', end: 'bottom bottom',
         scrub: reduced ? true : .6, invalidateOnRefresh: true,
-        onRefresh: self => { playhead.value = self.progress; paint(); },
+        onRefresh: self => { playhead.value = self.progress; playhead.split = splitAt(self.progress); paint(); },
       },
-    });
+    }).to(playhead, { value: 1, duration: 1, ease: 'none' }, 0)
+      .to(playhead, { split: 1, duration: .5, ease: 'power2.inOut' }, .25);
     return () => { tween.scrollTrigger?.kill(); tween.kill(); };
   }, [reduced]);
 
@@ -125,7 +128,7 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
   };
 
   return <section ref={section} className="engine-tour" id="difference" aria-label={tour.section}>
-    <div ref={stageRef} className={`engine-tour-stage hud-${side}`}>
+    <div ref={stageRef} className={`engine-tour-stage hud-${side}${xray ? ' is-xray' : ''}`}>
       <span ref={watermark} className="engine-watermark" aria-hidden="true">0{active + 1}</span>
       <div className="engine-tour-topline mono">
         <span>{tour.topline} <span className="red">/</span> {chapter.part}</span>
@@ -136,19 +139,25 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
         <div className="engine-studio-light" aria-hidden="true" />
         <div className="engine-stage-canvas">
           {near && <AssetBoundary name="Engine" fallback={<div className="engine-fallback">{tour.fallback}</div>}>
-            <Suspense fallback={<LoadingGauge />}><EngineStage reduced={reduced} mode={mode} inspect={inspect} debugZones={debugZones} /></Suspense>
+            <Suspense fallback={<LoadingGauge />}><EngineStage reduced={reduced} mode={mode} inspect={inspect} split={split} xray={xray} heat={heat} debugZones={debugZones} /></Suspense>
           </AssetBoundary>}
         </div>
         <div className="engine-tools">
           <div className="engine-modes" role="radiogroup" aria-label={tour.modesLabel}>
             {INSPECTION_MODES.map(item => <button key={item} role="radio" aria-checked={mode === item}
-              className={mode === item ? 'is-active' : ''} onClick={() => setMode(item)}>{tour.modes[item]}</button>)}
+              disabled={xray} className={mode === item ? 'is-active' : ''} onClick={() => setMode(item)}>{tour.modes[item]}</button>)}
           </div>
           <button className={'engine-inspect' + (inspect ? ' is-active' : '')} aria-pressed={inspect} onClick={() => setInspect(value => !value)}>
             {inspect ? <ScanLine size={15} /> : <Hand size={15} />}{inspect ? tour.inspectOff : tour.inspectOn}
           </button>
           {inspect && <p className="engine-inspect-hint mono" role="status">{tour.inspectHint}</p>}
         </div>
+        <div className="engine-effects" role="group" aria-label={tour.effectsLabel}>
+          <button aria-pressed={split} disabled={reduced} title={reduced ? tour.effectsStill : undefined} onClick={() => setSplit(value=>!value)}>{tour.split}</button>
+          <button aria-pressed={xray} onClick={() => setXray(value=>!value)}>{tour.xray}</button>
+          <button aria-pressed={heat} disabled={reduced} title={reduced ? tour.effectsStill : undefined} onClick={() => setHeat(value=>!value)}>{tour.heat}</button>
+        </div>
+        {(split || xray || heat) && <p className="engine-effect-note mono" role="status">{reduced ? tour.effectsStill : heat ? tour.heatHint : tour.effectsNote}</p>}
       </div>
 
       <svg className="engine-leader" aria-hidden="true"><path ref={leader} /></svg>
@@ -180,7 +189,7 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
           <button onClick={() => go(active + 1)} aria-label={active === 3 ? tour.continue : tour.next}><ArrowRight size={19} /></button>
         </div>
       </div>
-      <p className="engine-scroll-note mono">{tour.scrollNote}</p>
+      <p className="engine-scroll-note mono">{split ? tour.splitScroll : tour.scrollNote}</p>
     </div>
   </section>;
 }

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Environment, Lightformer } from '@react-three/drei';
 import type { Group } from 'three';
@@ -7,6 +7,8 @@ import { motion } from '../motion';
 import { BADGE_IN, BADGE_OUT } from '../lib/cameraSolver.ts';
 import { badgeChannel } from '../lib/motionClient.ts';
 import { useGraphicsRecovery, useSceneActivity } from './sceneHooks';
+import { createLiquidState, prepareLiquidBadge, stepLiquid } from '../lib/liquidBadge.ts';
+import { deviceProfile } from '../lib/deviceTier.ts';
 
 /** The forged badge: lettering, plate and wrenches stay upright; only GearAssembly turns. */
 export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boolean }) {
@@ -17,6 +19,9 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
     if (!gear) throw new Error('The articulated logo is missing its gear assembly.');
     return { badge, gear };
   }, [gltf]);
+  const finish = useMemo(() => prepareLiquidBadge(badge,deviceProfile().clearcoat),[badge]);
+  useEffect(() => finish.dispose,[finish]);
+  const liquid = useRef(createLiquidState());
   const tilt = useRef<Group>(null);
   const { visible, invalidate } = useSceneActivity(reduced);
   const recovery = useGraphicsRecovery();
@@ -24,6 +29,8 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
   useFrame((_, frameDelta) => {
     if (!tilt.current || !visible.current || document.hidden) return;
     const delta = Math.min(frameDelta, .1); // No large jump after tab suspension.
+    const energy = stepLiquid(liquid.current,motion.pointerX,motion.pointerY,motion.velocity,delta,reduced);
+    finish.update(energy,liquid.current.phase,motion.pointerX,motion.pointerY,reduced);
     motion.velocity *= Math.exp(-delta * 6);
     const input = badgeChannel.input;
     input[BADGE_IN.velocity] = motion.velocity;

@@ -9,7 +9,7 @@ import { motion, subscribeTourProgress } from '../motion';
 import { ENGINE_FOCUS, ENGINE_SCALE, chapterAt } from '../enginePath.ts';
 import { ENGINE_IN, ENGINE_OUT } from '../lib/cameraSolver.ts';
 import { engineChannel, sendFraming } from '../lib/motionClient.ts';
-import { deviceProfile } from '../lib/deviceTier.ts';
+import { cameraProfile, deviceProfile } from '../lib/deviceTier.ts';
 import { prepareEngineMaterials } from '../lib/engineMaterials.ts';
 import type { InspectionMode } from '../lib/inspection.ts';
 import { engineHud } from '../lib/engineHud.ts';
@@ -18,6 +18,7 @@ import { useFrameGovernor, useGraphicsRecovery, useSceneActivity } from './scene
 import { createEngineRig } from '../lib/engineRig.ts';
 import { createPlasmaMaterial } from '../lib/plasmaMaterial.ts';
 import { useEngineHeat } from './useEngineHeat.ts';
+import { frameAssembly } from '../lib/frameAssembly.ts';
 
 // White-balanced warm key, neutral rim and cool fill, calibrated against the reference.
 const KELVIN_4500 = '#fff0e1', KELVIN_5600 = '#ffefe5', KELVIN_7000_NAVY = '#8ea7d1';
@@ -183,6 +184,10 @@ export default function EngineModel({ assets, reduced, mode, inspect, split, xra
       }
     }
     if (stage.current) stage.current.rotation.y = reduced ? 0 : -engineChannel.latest[ENGINE_OUT.progress] * Math.PI * .3;
+    if(!inspect && camera instanceof PerspectiveCamera){
+      const fit=cameraProfile(window.innerWidth/Math.max(1,window.innerHeight));
+      frameAssembly(camera,bounds,size.width/Math.max(1,size.height),fit.frameWidth,fit.frameHeight);
+    }
     // Project the active inspection anchor to screen space for the DOM reticle + leader.
     camera.updateMatrixWorld();
     const chapter=chapterAt(motion.tour);

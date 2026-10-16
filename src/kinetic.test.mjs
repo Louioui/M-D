@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BoxGeometry, DataTexture, Group, Mesh, MeshStandardMaterial, Quaternion, Vector3 } from 'three';
+import { BoxGeometry, DataTexture, Group, Mesh, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from 'three';
+import { frameAssembly } from './lib/frameAssembly.ts';
 import { createEngineRig } from './lib/engineRig.ts';
 import { splitAt } from './lib/splitTimeline.ts';
 import { prepareEngineMaterials } from './lib/engineMaterials.ts';
@@ -66,6 +67,15 @@ test('X-ray swaps only instance materials, shares world-space heat, and restores
   prepared.setXray(false);assert.equal(prepared.model.children[0].material,physical);assert.equal(source.children[0].material,original);
   let originalDisposed=false;original.addEventListener('dispose',()=>originalDisposed=true);
   prepared.dispose();assert.equal(originalDisposed,false);
+});
+
+test('render-frame safety fit prevents clipping while a worker still has the previous pose',()=>{
+  const rig=createEngineRig(fixture()),bounds=rig.apply(1,false,false);
+  const camera=new PerspectiveCamera(38,1.4,.1,60);camera.position.set(.3,.1,.9);camera.lookAt(0,.1,0);
+  assert.ok(frameAssembly(camera,bounds,1.4,.8,.86)>0);
+  camera.updateMatrixWorld();
+  for(let i=0;i<bounds.length;i+=3){const p=new Vector3().fromArray(bounds,i).project(camera);assert.ok(Math.abs(p.x)<=.801 && Math.abs(p.y)<=.861 && p.z<1);}
+  const position=camera.position.clone();assert.equal(frameAssembly(camera,bounds,1.4,.8,.86),0);assert.deepEqual(camera.position,position);
 });
 
 test('liquid badge reacts to velocity, settles, respects reduced motion and owns its materials',()=>{

@@ -117,7 +117,7 @@ export default function Scene({ kind, reduced }: { kind: 'logo' | 'engine'; redu
     ? <img className="logo-fallback" src="/brand.webp" alt="M&D Multi-Service forged steel badge" />
     : <div className="engine-fallback">Precision. From the inside out.</div>;
   return <SceneBoundary fallback={fallback}>
-    <Canvas dpr={[1, 1.5]} frameloop="demand"
+    <Canvas dpr={[1, 1.5]} frameloop="demand" resize={{ offsetSize: true }}
       camera={{ position: kind === 'logo' ? [0, 0, 6.5] : [2.5, 1.5, 3.7], fov: 38 }}
       gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }} fallback={fallback}
       aria-label={kind === 'logo' ? 'M&D badge with an independently rotating steel gear' : 'Interactive four-zone engine tour'}>

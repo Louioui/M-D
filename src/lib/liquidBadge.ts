@@ -20,6 +20,8 @@ export function prepareLiquidBadge(badge: Object3D, highQuality: boolean) {
       if (materials.has(original)) return materials.get(original)!;
       const material = new MeshPhysicalMaterial();
       MeshStandardMaterial.prototype.copy.call(material,original);
+      // Standard.copy resets the defines; keep Physical's specular/IOR path.
+      Object.assign(material, { defines: { STANDARD: '', PHYSICAL: '' } });
       material.clearcoat = highQuality ? .32 : 0;
       material.clearcoatRoughness = .15;
       material.anisotropy = highQuality ? .12 : 0;

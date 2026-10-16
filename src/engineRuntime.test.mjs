@@ -83,6 +83,22 @@ test('solver damps toward the playhead and reports when it settles', () => {
   assert.equal(out[ENGINE_OUT.progress], .25, 'reduced motion snaps without a sweep');
 });
 
+test('fast scroll reversals keep framing points visible throughout quaternion damping',()=>{
+  for(const [aspect,viewport] of [[2.4,1.6],[1.3,.46]]){
+    const state=createEngineState(),out=new Float32Array(ENGINE_OUT.length);
+    // A raised cover and lowered sump exercise the split assembly's tall bounds.
+    const bounds=[...FRAMING,0,2.3,0,0,-1.4,0];setFraming(state,bounds);
+    for(const progress of [0,1,.1,.9,.2,.8,.3,.7,1,0]){
+      const input=engineInput(progress,aspect,viewport);input[ENGINE_IN.split]=progress;
+      solveEngine(state,input,out);
+      const inverse=new Quaternion(out[ENGINE_OUT.qx],out[ENGINE_OUT.qy],out[ENGINE_OUT.qz],out[ENGINE_OUT.qw]).invert();
+      const position=new Vector3(out[ENGINE_OUT.px],out[ENGINE_OUT.py],out[ENGINE_OUT.pz]);const tan=Math.tan(out[ENGINE_OUT.fov]*Math.PI/360);
+      for(let i=0;i<bounds.length;i+=3){const p=new Vector3(bounds[i],bounds[i+1],bounds[i+2]).sub(position).applyQuaternion(inverse);
+        assert.ok(p.z<0);assert.ok(Math.abs(p.y/-p.z)<=tan*1.001,'Vertical bounds during an unsettled frame');assert.ok(Math.abs(p.x/-p.z)<=tan*aspect*1.001,'Horizontal bounds during an unsettled frame');}
+    }
+  }
+});
+
 test('badge gear idles at one rpm, follows scroll velocity both ways, and rests when reduced', () => {
   const state = createBadgeState(), out = new Float32Array(BADGE_OUT.length);
   const input = new Float32Array(BADGE_IN.length); input[BADGE_IN.dt] = .05;

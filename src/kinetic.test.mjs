@@ -78,6 +78,7 @@ test('liquid badge reacts to velocity, settles, respects reduced motion and owns
   const source=fixture(),original=source.children[0].material;
   const finish=prepareLiquidBadge(source,true);
   assert.notEqual(source.children[0].material,original);
+  assert.ok('PHYSICAL' in finish.materials[0].defines,'Physical specular/IOR shader features survive the Standard material copy');
   finish.update(.8,1,.5,.3,false);assert.equal(finish.uniforms.uLiquid.value,.8);assert.ok(finish.materials[0].anisotropy>.12);
   finish.update(0,0,.5,.3,true);assert.equal(finish.materials[0].envMapRotation.y,0);
   finish.dispose();

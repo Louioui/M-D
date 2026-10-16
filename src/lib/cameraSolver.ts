@@ -62,6 +62,17 @@ export function solveEngine(state: EngineSolverState, input: Float32Array, out: 
   // Lift the engine in frame by aiming slightly below it.
   let distance = position.distanceTo(target);
   target.addScaledVector(up, -profile.yOffset * tanY * distance);
+  position.copy(target).addScaledVector(direction, distance);
+  look.lookAt(position, target, worldUp);
+  goal.setFromRotationMatrix(look);
+  if (!state.initialized || reduced) state.quaternion.copy(goal);
+  else state.quaternion.slerp(goal, 1 - Math.exp(-dt * 14));
+  // Fit against the orientation actually rendered, including in-between frames.
+  // Moving the camera to a new orbit while retaining its old damped rotation
+  // briefly pushed the raised cover offscreen during fast split-view scrubs.
+  direction.set(0,0,1).applyQuaternion(state.quaternion);
+  right.set(1,0,0).applyQuaternion(state.quaternion);
+  up.set(0,1,0).applyQuaternion(state.quaternion);
   // Fit the measured support points so no viewport shape can clip the engine.
   const aspect = Math.max(.2, input[ENGINE_IN.aspect]);
   const fitY = tanY * profile.frameHeight, fitX = tanY * aspect * profile.frameWidth;
@@ -72,10 +83,6 @@ export function solveEngine(state: EngineSolverState, input: Float32Array, out: 
   }
   position.copy(target).addScaledVector(direction, distance);
 
-  look.lookAt(position, target, worldUp);
-  goal.setFromRotationMatrix(look);
-  if (!state.initialized || reduced) state.quaternion.copy(goal);
-  else state.quaternion.slerp(goal, 1 - Math.exp(-dt * 14));
   state.initialized = true;
 
   out[ENGINE_OUT.channel] = CHANNEL.engine;

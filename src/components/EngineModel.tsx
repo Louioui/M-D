@@ -206,11 +206,13 @@ export default function EngineModel({ assets, reduced, mode, inspect, split, xra
       </group>
     </Environment>
     <group name="EngineTourModel" scale={ENGINE_SCALE}><primitive object={prepared.model} /></group>
-    {xray && <group name="Illustrated crimson energy cores" scale={ENGINE_SCALE}>
+    {/* Keep core geometry mounted across toggles and restored contexts. This
+        avoids allocations and disposal callbacks holding pre-loss GPU handles. */}
+    <group name="Illustrated crimson energy cores" scale={ENGINE_SCALE} visible={xray}>
       {[-.375,-.125,.125,.375].map(x=><mesh key={x} position={[x,-.02,.02]} material={core} renderOrder={1}>
         <cylinderGeometry args={[.064,.075,.42,16,1]} />
       </mesh>)}
-    </group>}
+    </group>
     <group ref={stage} name="EngineTurntable">
       {profile.shadows && level < 2 && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.19, 0]} receiveShadow>
         <circleGeometry args={[1.25, 64]} /><shadowMaterial transparent opacity={.5} />

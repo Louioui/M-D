@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Flip } from 'gsap/Flip';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Instagram } from 'lucide-react';
 import { motion, useMotionPreference } from './motion';
 import { useLanguage } from './i18n';
 import { type ServiceKey } from './copy.ts';
+import { INSTAGRAM_URL } from './shop.ts';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import ServicesSection from './components/ServicesSection';
@@ -129,6 +130,7 @@ export default function App() {
       <a className="brand" href="#home">M&D <span className="brand-small">MULTI-SERVICE</span></a>
       <span className="mono">{copy.footer.tagline}</span>
       <span className="mono footer-name">{copy.hero.name}</span>
+      <a href={INSTAGRAM_URL} target="_blank" rel="noreferrer" className="footer-email footer-instagram"><Instagram size={16} />{copy.footer.instagram}</a>
       <a href="mailto:md_multiservice@yahoo.com" className="footer-email">{copy.footer.email} <ArrowUpRight size={14} /></a>
       <span className="mono copyright">© {new Date().getFullYear()} M&D MULTI-SERVICE · 419 N BOYLE AVE, LOS ANGELES, CA 90033 · (323) 354-4795</span>
     </footer>

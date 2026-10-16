@@ -69,7 +69,7 @@ src/
 
 The directions link and embedded Google map point to 419 N Boyle Ave, Los Angeles, CA 90033. Phone: +1 (323) 354-4795. Email: md_multiservice@yahoo.com.
 
-The 4.6★ rating and 90+ review count are owner-supplied (October 2026) and link to the live Google listing; update `SHOP.rating` / `SHOP.reviewCount` if they change. No testimonial text is published. The Instagram handle supplied ("@m&d multi service") is not a valid handle, so it is not linked. The atmospheric garage background is generated artwork, not a photograph of the actual premises. The engine is an illustrative supplied mesh, not a guarantee of any vehicle's construction or compatibility.
+The 4.6★ rating and 90+ review count are owner-supplied (October 2026) and link to the live Google listing; update `SHOP.rating` / `SHOP.reviewCount` if they change. No testimonial text is published. Instagram: [@m_and_d__multi_service2021](https://www.instagram.com/m_and_d__multi_service2021/) (owner-confirmed), linked from the location section, the footer and the vCard. The atmospheric garage background is generated artwork, not a photograph of the actual premises. The engine is an illustrative supplied mesh, not a guarantee of any vehicle's construction or compatibility.
 
 ## Assets
 

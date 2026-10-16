@@ -84,6 +84,7 @@ const en = {
     ratingLabel: 'Google rating',
     reviews: (count: string) => `${count} verified Google reviews`,
     readReviews: 'Read our reviews on Google',
+    instagram: 'See our work on Instagram',
     directions: 'Get directions',
     hoursTitle: 'SHOP HOURS · LOS ANGELES TIME',
     hours: [['Monday – Friday', '8:30 AM – 6:00 PM'], ['Saturday', '8:00 AM – 4:00 PM'], ['Sunday', 'Closed']] as [string, string][],
@@ -106,7 +107,7 @@ const en = {
     invalid: 'Add your name, vehicle year, make, and model first.',
     required: 'required',
   },
-  footer: { tagline: 'FAMILY-OWNED. BOYLE HEIGHTS, LOS ANGELES.', email: 'Email David & Edith' },
+  footer: { tagline: 'FAMILY-OWNED. BOYLE HEIGHTS, LOS ANGELES.', email: 'Email David & Edith', instagram: 'M&D on Instagram' },
 };
 
 export type Copy = typeof en;
@@ -181,6 +182,7 @@ const es: Copy = {
     ratingLabel: 'Calificación en Google',
     reviews: (count: string) => `${count} reseñas verificadas en Google`,
     readReviews: 'Lea nuestras reseñas en Google',
+    instagram: 'Vea nuestro trabajo en Instagram',
     directions: 'Cómo llegar',
     hoursTitle: 'HORARIO · HORA DE LOS ÁNGELES',
     hours: [['Lunes a viernes', '8:30 a.m. – 6:00 p.m.'], ['Sábado', '8:00 a.m. – 4:00 p.m.'], ['Domingo', 'Cerrado']],
@@ -203,7 +205,7 @@ const es: Copy = {
     invalid: 'Primero escriba su nombre y el año, marca y modelo de su vehículo.',
     required: 'obligatorio',
   },
-  footer: { tagline: 'NEGOCIO FAMILIAR. BOYLE HEIGHTS, LOS ÁNGELES.', email: 'Escríbale a David y Edith' },
+  footer: { tagline: 'NEGOCIO FAMILIAR. BOYLE HEIGHTS, LOS ÁNGELES.', email: 'Escríbale a David y Edith', instagram: 'M&D en Instagram' },
 };
 
 export const COPY: Record<Lang, Copy> = { en, es };

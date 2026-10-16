@@ -137,6 +137,14 @@ p { font-size: 17px; line-height: 1.65; color: #b4b8bf; }
 .rating-stars-base { display: inline-flex; color: #f4b63f55; }
 .rating-stars-fill { position: absolute; inset: 0 auto 0 0; display: inline-flex; overflow: hidden; white-space: nowrap; }
 .rating-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #ff7a83; }
+.instagram-link { display: flex; align-items: center; gap: 14px; min-height: 56px; margin: -8px 0 22px; padding: 0 18px; border: 1px solid var(--line); background: #ffffff04; transition: border-color .2s; }
+.instagram-link:hover { border-color: var(--steel); }
+.instagram-link > svg:first-child { color: var(--red); }
+.instagram-link > span { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 600; }
+.instagram-link .mono { font-size: 10px; font-weight: 400; color: #aab1bd; letter-spacing: .6px; }
+.instagram-link > svg:last-child { margin-left: auto; color: #8b8f96; }
+.footer-instagram { gap: 8px; }
+.footer-instagram + .footer-email { margin-left: 0; }
 .route-card { padding: 20px 22px; border: 1px solid var(--line); background: #ffffff04; }
 .route-label { color: var(--red); font-size: 10px; margin-bottom: 10px; }
 .route-card address { font-style: normal; display: flex; align-items: center; gap: 15px; font-size: 18px; line-height: 1.5; }

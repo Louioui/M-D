@@ -44,6 +44,7 @@ test('vCard carries the verified contact details with CRLF lines', () => {
   assert.ok(card.endsWith('END:VCARD\r\n'));
   assert.ok(card.includes('TEL;TYPE=WORK,VOICE,TEXT:+13233544795'));
   assert.ok(card.includes('EMAIL;TYPE=INTERNET:md_multiservice@yahoo.com'));
+  assert.ok(card.includes('X-SOCIALPROFILE;TYPE=instagram:https://www.instagram.com/m_and_d__multi_service2021/'));
   assert.ok(card.includes('ADR;TYPE=WORK:;;419 N Boyle Ave;Los Angeles;CA;90033;USA'));
   assert.equal(SHOP.phoneDisplay, '(323) 354-4795');
   assert.ok(!/[^\r]\n/.test(card), 'Every line break is CRLF');

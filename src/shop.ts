@@ -16,11 +16,13 @@ export const SHOP = {
   timezone: 'America/Los_Angeles',
   rating: 4.6,
   reviewCount: '90+',
+  instagramHandle: 'm_and_d__multi_service2021',
 } as const;
 
 export const SHOP_ADDRESS = `${SHOP.street}, ${SHOP.city}, ${SHOP.region} ${SHOP.postalCode}`;
 export const DIRECTIONS_URL = 'https://www.google.com/maps/dir/?api=1&destination=419+N+Boyle+Ave+Los+Angeles+CA+90033';
 export const REVIEWS_URL = 'https://www.google.com/maps/search/?api=1&query=M%26D+Multi-Service+419+N+Boyle+Ave+Los+Angeles+CA+90033';
+export const INSTAGRAM_URL = `https://www.instagram.com/${SHOP.instagramHandle}/`;
 export const MAP_EMBED_URL = 'https://maps.google.com/maps?q=419%20N%20Boyle%20Ave%20Los%20Angeles%20CA%2090033&t=&z=15&ie=UTF8&iwloc=&output=embed';
 
 /** Opening minutes after local midnight, Sunday first. `null` is closed. */
@@ -97,6 +99,7 @@ export function shopVCard() {
     `ORG:${vcardEscape(SHOP.name)}`,
     `TEL;TYPE=WORK,VOICE,TEXT:${SHOP.phone}`,
     `EMAIL;TYPE=INTERNET:${SHOP.email}`,
+    `X-SOCIALPROFILE;TYPE=instagram:${INSTAGRAM_URL}`,
     `ADR;TYPE=WORK:;;${vcardEscape(SHOP.street)};${SHOP.city};${SHOP.region};${SHOP.postalCode};USA`,
     `NOTE:${vcardEscape('Mon–Fri 8:30 AM–6:00 PM. Sat 8:00 AM–4:00 PM. Sun closed.')}`,
     'END:VCARD',

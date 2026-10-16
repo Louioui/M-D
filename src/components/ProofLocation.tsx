@@ -1,6 +1,6 @@
-import { ArrowUpRight, Clock, MapPin, Navigation, Phone, Star } from 'lucide-react';
+import { ArrowUpRight, Clock, Instagram, MapPin, Navigation, Phone, Star } from 'lucide-react';
 import { useLanguage } from '../i18n';
-import { DIRECTIONS_URL, MAP_EMBED_URL, REVIEWS_URL, SHOP } from '../shop.ts';
+import { DIRECTIONS_URL, INSTAGRAM_URL, MAP_EMBED_URL, REVIEWS_URL, SHOP } from '../shop.ts';
 import ShopStatus from './ShopStatus';
 
 /** Stage 4 — social proof and the Boyle Heights route card. */
@@ -23,6 +23,9 @@ export default function ProofLocation() {
             <span className="mono">{proof.reviews(SHOP.reviewCount)}</span>
             <span className="rating-link">{proof.readReviews} <ArrowUpRight size={14} /></span>
           </span>
+        </a>
+        <a className="instagram-link" href={INSTAGRAM_URL} target="_blank" rel="noreferrer">
+          <Instagram size={20} /><span>{proof.instagram}<span className="mono">@{SHOP.instagramHandle}</span></span><ArrowUpRight size={15} />
         </a>
         <div className="route-card">
           <p className="mono route-label">{proof.route}</p>

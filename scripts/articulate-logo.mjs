@@ -22,20 +22,24 @@ const source = root.listMeshes()[0].listPrimitives()[0];
 const positions = source.getAttribute('POSITION'), indices = source.getIndices();
 // Front objects are traced separately so the old fixed gear is removed rather than
 // hidden behind another gear. The central circular plate remains stationary.
+// Lower wrench heads are traced tightly (open-end jaw outline, box-end ring ellipse).
+// Earlier bounding rectangles kept fragments of the old gear teeth around them.
+const OPEN_END_HEAD = [[702,691],[722,698],[760,708],[796,713],[827,715],[856,725],[880,743],[895,765],[901,787],[899,798],[888,799],[877,786],[861,773],[841,767],[821,772],[807,785],[802,803],[803,821],[814,832],[834,840],[851,850],[859,863],[854,872],[836,874],[810,874],[781,865],[760,851],[747,834],[742,812],[728,790],[714,765],[702,752]];
+const BOX_END_RING = { cx: 200, cy: 794, rx: 72, ry: 66 };
 const silhouettes = [
-  [[700,700],[914,700],[914,892],[700,892]],
-  [[122,733],[278,733],[278,862],[122,862]],
+  OPEN_END_HEAD,
   [[265,103],[448,103],[456,128],[554,127],[580,180],[581,106],[688,103],[730,158],[733,300],[694,314],[577,278],[460,272],[350,309],[269,341]],
-  [[85,231],[144,212],[194,210],[226,225],[246,257],[263,301],[290,351],[339,401],[390,429],[421,477],[664,679],[720,702],[763,717],[822,723],[862,751],[881,792],[895,825],[849,797],[812,796],[792,819],[795,848],[832,870],[788,875],[755,862],[729,830],[710,786],[692,757],[646,737],[366,513],[306,463],[264,442],[220,433],[151,437],[122,433],[132,394],[110,380],[79,352],[62,318],[59,293],[82,301],[128,330],[159,332],[173,302],[168,279],[127,257],[92,247]],
-  [[873,212],[833,217],[791,233],[773,259],[750,295],[750,339],[718,365],[661,406],[618,449],[588,505],[306,704],[269,727],[225,724],[184,739],[154,769],[136,810],[142,840],[165,855],[204,858],[238,843],[264,813],[268,786],[302,754],[351,729],[642,523],[706,475],[745,445],[780,412],[817,400],[870,386],[911,368],[935,336],[944,309],[934,275],[916,304],[891,321],[866,326],[840,311],[826,281],[837,259],[864,236]],
+  [[85,231],[144,212],[194,210],[226,225],[246,257],[263,301],[290,351],[339,401],[390,429],[421,477],[664,679],[720,702],[760,708],[714,762],[692,748],[646,737],[366,513],[306,463],[264,442],[220,433],[151,437],[122,433],[132,394],[110,380],[79,352],[62,318],[59,293],[82,301],[128,330],[159,332],[173,302],[168,279],[127,257],[92,247]],
+  [[873,212],[833,217],[791,233],[773,259],[750,295],[750,339],[718,365],[661,406],[618,449],[588,505],[306,700],[276,715],[246,731],[262,770],[272,790],[302,754],[351,729],[642,523],[706,475],[745,445],[780,412],[817,400],[870,386],[911,368],[935,336],[944,309],[934,275],[916,304],[891,321],[866,326],[840,311],[826,281],[837,259],[864,236]],
   [[75,477],[102,465],[126,464],[130,432],[198,435],[195,480],[303,481],[345,418],[651,418],[696,479],[804,479],[800,401],[840,394],[870,464],[922,479],[924,537],[908,550],[899,640],[886,661],[813,653],[744,644],[252,645],[106,665],[94,548],[78,541]],
 ];
 function inside(x,y,poly){let hit=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [xi,yi]=poly[i],[xj,yj]=poly[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)hit=!hit;}return hit;}
-function keep(x,y){return Math.hypot(x,y)<.665 || silhouettes.some(p=>inside(500+x/2.15*1000,500-y/2.15*1000,p));}
+function inRing(px,py){const {cx,cy,rx,ry}=BOX_END_RING;return ((px-cx)/rx)**2+((py-cy)/ry)**2<=1;}
+function keep(x,y){const px=500+x/2.15*1000,py=500-y/2.15*1000;return Math.hypot(x,y)<.665 || inRing(px,py) || silhouettes.some(p=>inside(px,py,p));}
 const retained=[],positionArray=positions.getArray();
 for(let i=0;i<indices.getCount();i+=3){const face=[indices.getScalar(i),indices.getScalar(i+1),indices.getScalar(i+2)];let x=0,y=0;for(const n of face){x+=positionArray[n*3]/3;y+=positionArray[n*3+1]/3;}if(keep(x,y))retained.push(...face);}
 source.setIndices(doc.createAccessor('Stationary indices').setType('SCALAR').setArray(new Uint32Array(retained)).setBuffer(buffer));
-await doc.transform(dedup(),weld(),simplify({simplifier:MeshoptSimplifier,ratio:.1,error:.01}),textureCompress({encoder:sharp,targetFormat:'webp',resize:[2048,2048]}));
+await doc.transform(dedup(),weld(),simplify({simplifier:MeshoptSimplifier,ratio:.1,error:.01,lockBorder:true}),textureCompress({encoder:sharp,targetFormat:'webp',resize:[2048,2048]}));
 root.listNodes()[0].setName('StationaryBadge');root.listMeshes()[0].setName('Original lettering, plate and crossed wrenches');
 const gear = doc.createNode('GearAssembly'); scene.addChild(gear);
 // Deterministic, subtle surface variation gives the new metal a worn brushed finish.

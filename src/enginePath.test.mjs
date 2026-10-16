@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Vector3 } from 'three';
-import { sampleEnginePath, chapterAt } from './enginePath.mjs';
+import { sampleEnginePath, chapterAt } from './enginePath.ts';
 
 test('guided engine path is continuous, stays outside the model, and changes inspection angles', () => {
   const point = new Vector3(), target = new Vector3(), previous = new Vector3();

@@ -2,7 +2,7 @@
 
 Reference: concept.png, generated with the built-in image tool. Preserve the actual supplied badge and engine instead of the illustrative meshes in the concept.
 
-- Color: carbon #111111; surfaces #151515 / #171717; warm neutral text #f2f0eb; secondary #aaa; safety red #ed2429; structural lines white at 13% opacity.
+- Color: matte carbon #111111; mechanic navy #1B263B (glass HUDs, fill light); brushed steel #8D99AE (secondary type, rules); safety crimson #E63946; warm neutral text #f2f0eb; structural lines white at 13% opacity.
 - Display: Barlow Condensed 800, compressed horizontal composition in the desktop hero; supporting text Barlow 400/500/600; utility labels IBM Plex Mono 400.
 - Geometry: square or 2px button corners, restrained structural rules, open service rows, single glass HUD with a fine red leader line. No generic feature card grid.
 - Spacing: 4–6% section gutters, 80px desktop / 68px mobile fixed header; 48–56px action buttons; 100svh engine stage with 400vh sticky travel.
@@ -20,4 +20,4 @@ M&D MULTI-SERVICE; Services; The difference; Find us; Book a service; HARD WORK.
 2. The engine is the supplied model, with its original surface textures; the generic conceptual engine render is not substituted.
 3. The customer-requested conversion is a slide-over vault, rather than the inline form depicted in the concept. The form typography, fields, palette and actions follow the same system.
 4. A compact service accordion and an address/hours/map section complete the navigation and actual conversion flow.
-5. Copy avoids unverified ratings, testimonials, certifications and guarantees.
+5. Copy avoids testimonials, certifications and guarantees. The 4.6★ / 90+ Google rating is owner-supplied and links to the live listing. Engine readouts are labelled SIM.

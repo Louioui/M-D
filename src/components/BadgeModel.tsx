@@ -1,0 +1,59 @@
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Environment, Lightformer } from '@react-three/drei';
+import type { Group } from 'three';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { motion } from '../motion';
+import { BADGE_IN, BADGE_OUT } from '../lib/cameraSolver.ts';
+import { badgeChannel } from '../lib/motionClient.ts';
+import { useSceneActivity } from './sceneHooks';
+
+/** The forged badge: lettering, plate and wrenches stay upright; only GearAssembly turns. */
+export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boolean }) {
+  // Geometry and textures remain shared; object transforms belong to this instance.
+  const { badge, gear } = useMemo(() => {
+    const badge = gltf.scene.clone(true);
+    const gear = badge.getObjectByName('GearAssembly');
+    if (!gear) throw new Error('The articulated logo is missing its gear assembly.');
+    return { badge, gear };
+  }, [gltf]);
+  const tilt = useRef<Group>(null);
+  const { visible, invalidate } = useSceneActivity(reduced);
+
+  useFrame((_, frameDelta) => {
+    if (!tilt.current || !visible.current || document.hidden) return;
+    const delta = Math.min(frameDelta, .1); // No large jump after tab suspension.
+    motion.velocity *= Math.exp(-delta * 6);
+    const input = badgeChannel.input;
+    input[BADGE_IN.velocity] = motion.velocity;
+    input[BADGE_IN.pointerX] = motion.pointerX;
+    input[BADGE_IN.pointerY] = motion.pointerY;
+    input[BADGE_IN.reduced] = reduced ? 1 : 0;
+    badgeChannel.push(delta);
+    if (badgeChannel.ready) {
+      const out = badgeChannel.latest;
+      gear.rotation.z = out[BADGE_OUT.gear];
+      tilt.current.rotation.set(out[BADGE_OUT.tiltX], out[BADGE_OUT.tiltY], 0);
+    }
+    if (!reduced || badgeUnsettled()) invalidate();
+  });
+
+  return <>
+    <ambientLight intensity={1.4} />
+    <directionalLight position={[3, 5, 5]} intensity={3.5} />
+    <directionalLight position={[-4, 1, 2]} intensity={2} />
+    <pointLight position={[3, 1, -3]} color="#E63946" intensity={24} />
+    <Environment resolution={128} frames={1}>
+      <Lightformer intensity={4} position={[0, 4, 3]} scale={[8, 2, 1]} />
+      <Lightformer intensity={2} position={[-4, 0, 1]} scale={[2, 8, 1]} />
+      <Lightformer intensity={2} position={[4, 0, -2]} scale={[2, 8, 1]} />
+    </Environment>
+    <group ref={tilt} scale={1.38}><primitive object={badge} /></group>
+  </>;
+}
+
+/** Reduced motion still needs frames until the gear and tilt have returned to rest. */
+function badgeUnsettled() {
+  const out = badgeChannel.latest;
+  return Math.abs(out[BADGE_OUT.gear]) + Math.abs(out[BADGE_OUT.tiltX]) + Math.abs(out[BADGE_OUT.tiltY]) > 1e-4;
+}

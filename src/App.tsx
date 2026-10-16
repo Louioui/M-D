@@ -1,18 +1,136 @@
-import {lazy,Suspense,useEffect,useRef,useState} from 'react';import gsap from 'gsap';import {ScrollTrigger} from 'gsap/ScrollTrigger';import {Flip} from 'gsap/Flip';import {ArrowUpRight,ArrowRight,ArrowDown,MapPin,Phone,Plus,Minus,Menu,X,Navigation,Clock,MoveUpRight} from 'lucide-react';import Booking from './Booking';import EngineTour from './EngineTour';import {shopStatus} from './shop.mjs';import {motion,useMotionPreference} from './motion';
-const Scene=lazy(()=>import('./Scene'));gsap.registerPlugin(ScrollTrigger,Flip);gsap.ticker.lagSmoothing(0);
-const services=[['01','Engine checks & repair','A warning light, a strange sound, or something that just feels off. Let’s get to the source.'],['02','Brakes & suspension','From brake concerns to a rough ride, tell us what you’re feeling behind the wheel.'],['03','Oil changes & car care','A little regular attention goes a long way. Keep your everyday driver ready for the next mile.'],['04','A/C & electrical','Trouble staying cool or getting started? Bring us the symptoms and we’ll talk through the next step.']];
-function Status(){const [status,setStatus]=useState(()=>shopStatus());useEffect(()=>{const timer=setInterval(()=>setStatus(shopStatus()),30000);return()=>clearInterval(timer)},[]);return <span className="shop-status mono"><i className={status.open?'open':''}/>{status.label}<span className="status-detail"> · {status.detail}</span></span>}
-export default function App(){const reduced=useMotionPreference();const [booking,setBooking]=useState(false),[menu,setMenu]=useState(false),[service,setService]=useState<number|null>(0),[gyro,setGyro]=useState(false);const logo=useRef<HTMLDivElement>(null),heroSlot=useRef<HTMLDivElement>(null),navSlot=useRef<HTMLDivElement>(null);const openBooking=()=>{setMenu(false);setBooking(true)};
-useEffect(()=>{let frame=0,resizeFrame=0,lastY=window.scrollY,lastTime=performance.now(),docked=false,alive=true;const pointer=(e:PointerEvent)=>{motion.pointerX=e.clientX/innerWidth*2-1;motion.pointerY=e.clientY/innerHeight*2-1};const orient=(e:DeviceOrientationEvent)=>{if(!motion.gyroAllowed)return;motion.pointerX=Math.max(-1,Math.min(1,(e.gamma??0)/35));motion.pointerY=Math.max(-1,Math.min(1,(e.beta??0)/60))};
-function dock(next:boolean){if(next===docked||!logo.current)return;docked=next;const state=Flip.getState(logo.current);(next?navSlot:heroSlot).current?.appendChild(logo.current);logo.current.classList.toggle('docked',next);Flip.from(state,{duration:motion.reduced?0:.85,ease:'power3.inOut',scale:true,absolute:true,prune:true,onComplete:()=>{if(logo.current)gsap.set(logo.current,{clearProps:'all'})}});}
-const update=()=>{frame=0;if(!alive)return;const now=performance.now(),y=window.scrollY;motion.velocity=(y-lastY)/Math.max(16,now-lastTime)*1000;motion.scroll=y/Math.max(1,document.documentElement.scrollHeight-innerHeight);lastY=y;lastTime=now;dock(motion.scroll>=.15);};const scroll=()=>{if(!frame)frame=requestAnimationFrame(update)};
-const resize=()=>{if(!resizeFrame)resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;motion.mobile=innerWidth<768;ScrollTrigger.refresh();scroll()})};motion.mobile=innerWidth<768;scroll();
-window.addEventListener('scroll',scroll,{passive:true});window.addEventListener('resize',resize,{passive:true});window.addEventListener('pointermove',pointer,{passive:true});window.addEventListener('deviceorientation',orient,{passive:true});return()=>{alive=false;cancelAnimationFrame(frame);cancelAnimationFrame(resizeFrame);window.removeEventListener('scroll',scroll);window.removeEventListener('resize',resize);window.removeEventListener('pointermove',pointer);window.removeEventListener('deviceorientation',orient);if(logo.current&&heroSlot.current)heroSlot.current.appendChild(logo.current)}},[]);
-useEffect(()=>{if(reduced){motion.pointerX=motion.pointerY=0;}},[reduced]);
-async function enableGyro(){try{const api=DeviceOrientationEvent as typeof DeviceOrientationEvent &{requestPermission?:()=>Promise<string>};if(api.requestPermission){const status=await api.requestPermission();motion.gyroAllowed=status==='granted';setGyro(motion.gyroAllowed)}else {motion.gyroAllowed=true;setGyro(true)}}catch{setGyro(false)}}
-return <><a className="skip-link" href="#main">Skip to content</a><header className="site-header"><a className="brand" href="#home" aria-label="M&D Multi-Service home"><span className="nav-logo-slot" ref={navSlot}/><span>M&D <span className="brand-small">MULTI-SERVICE</span></span></a><nav aria-label="Main navigation" className={menu?'nav-links mobile-open':'nav-links'}><a href="#services" onClick={()=>setMenu(false)}>Services</a><a href="#difference" onClick={()=>setMenu(false)}>The difference</a><a href="#location" onClick={()=>setMenu(false)}>Find us</a></nav><div className="header-actions"><button className="button primary" onClick={openBooking}>Book a service <ArrowUpRight size={17}/></button><button className="menu-toggle icon-button" aria-label={menu?'Close menu':'Open menu'} aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div></header>
-<main id="main"><section id="home" className="hero"><div className="garage-background"/><div className="hero-grid"/><div className="hero-content"><div className="hero-title"><h1><span>HARD WORK.</span><span>HONEST REPAIRS.</span></h1></div><div className="hero-logo-slot" ref={heroSlot}><div className="hero-logo" ref={logo}><Suspense fallback={<img src="/brand.webp" alt="M&D Multi-Service"/>}><Scene kind="logo" reduced={reduced}/></Suspense></div></div><div className="hero-bottom"><div className="hero-intro"><p className="mono">YOUR NEIGHBORHOOD.<br/>YOUR MECHANICS.<br/><span>DAVID & EDITH.</span></p><button className="button primary hero-cta" onClick={openBooking}>Let’s get you road-ready <ArrowUpRight size={19}/></button></div><a href="#location" className="hero-location"><MapPin size={22}/><span className="mono">419 N BOYLE AVE<br/><span>LOS ANGELES, CA 90033</span></span></a></div><div className="hero-baseline"><Status/><a className="scroll-invite mono" href="#difference">SCROLL TO LOOK CLOSER <ArrowDown size={14}/></a>{typeof DeviceOrientationEvent!=='undefined'&&<button className="tilt-button mono" onClick={enableGyro}>{gyro?'TILT ENABLED':'ENABLE TILT'} <MoveUpRight size={12}/></button>}</div></div></section>
-<section id="services" className="services-section"><div className="section-topline mono"><span>01 / WHAT WE DO</span><span>CARE FOR THE WHOLE CAR</span></div><div className="services-layout"><div><h2>BUILT FOR<br/><span className="muted">THE EVERYDAY.</span></h2><p>Your commute. Your family. Your way home.<br/>We help keep what moves you moving.</p><button className="text-link" onClick={openBooking}>Talk to your mechanics <ArrowUpRight size={17}/></button></div><div className="service-list">{services.map(([n,title,description],i)=><div className={'service-item '+(service===i?'expanded':'')} key={n}><button aria-expanded={service===i} aria-controls={'service-'+i} onClick={()=>setService(service===i?null:i)}><span className="mono service-number">{n}</span><span>{title}</span>{service===i?<Minus size={18}/>:<Plus size={18}/>}</button><div id={'service-'+i} hidden={service!==i}><p>{description}</p><button className="text-link" onClick={openBooking}>Request this service <ArrowUpRight size={15}/></button></div></div>)}</div></div></section>
-<EngineTour reduced={reduced} onBook={openBooking}/>
-<section id="location" className="location-section"><div className="section-topline mono"><span>03 / RIGHT HERE IN BOYLE HEIGHTS</span><Status/></div><div className="location-layout"><div className="location-copy"><h2>GOOD PEOPLE.<br/>GREAT WORK.</h2><p>A family shop with a neighborhood heart.<br/>Meet David & Edith at M&D Multi-Service.</p><address><MapPin size={23}/><span>419 N Boyle Ave<br/>Los Angeles, CA 90033</span></address><div className="location-buttons"><a className="button primary" href="https://www.google.com/maps/dir/?api=1&destination=419+N+Boyle+Ave+Los+Angeles+CA+90033" target="_blank" rel="noreferrer">Get directions <Navigation size={17}/></a><a className="button secondary" href="tel:+13233544795"><Phone size={16}/>(323) 354-4795</a></div><div className="hours"><Clock size={17}/><div><span className="mono">SHOP HOURS · LOS ANGELES TIME</span><dl><div><dt>Monday – Friday</dt><dd>8:30 AM – 6:00 PM</dd></div><div><dt>Saturday</dt><dd>8:00 AM – 4:00 PM</dd></div><div><dt>Sunday</dt><dd>Closed</dd></div></dl></div></div></div><div className="location-map"><iframe title="M&D Multi-Service location at 419 N Boyle Ave" src="https://maps.google.com/maps?q=419%20N%20Boyle%20Ave%20Los%20Angeles%20CA%2090033&t=&z=15&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade"/><div className="map-caption mono"><MapPin size={14}/> YOUR NEIGHBORHOOD. YOUR SHOP. <ArrowUpRight size={15}/></div></div></div></section>
-<section className="conversion-section" id="contact"><div className="garage-background"/><div className="conversion-content"><div className="section-topline mono"><span>04 / LET’S GET YOU ROAD-READY</span><span>DAVID & EDITH</span></div><div className="conversion-row"><h2>LET’S GET<br/><span>TO WORK.</span></h2><div><p>Something doesn’t sound right?<br/>Maintenance on your mind?<br/>Start with a conversation.</p><button className="button primary" onClick={openBooking}>Book a service <ArrowUpRight size={22}/></button><a className="text-link" href="sms:+13233544795">Or text us directly <ArrowRight size={16}/></a></div></div></div></section></main><footer><a className="brand" href="#home">M&D <span className="brand-small">MULTI-SERVICE</span></a><span className="mono">FAMILY-OWNED. BOYLE HEIGHTS, LOS ANGELES.</span><a href="mailto:md_multiservice@yahoo.com" className="footer-email">Email David & Edith <ArrowUpRight size={14}/></a><span className="mono copyright">© {new Date().getFullYear()} M&D MULTI-SERVICE</span></footer><Booking open={booking} onClose={()=>setBooking(false)}/></>}
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Flip } from 'gsap/Flip';
+import { ArrowUpRight } from 'lucide-react';
+import { motion, useMotionPreference } from './motion';
+import { useLanguage } from './i18n';
+import { type ServiceKey } from './copy.ts';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import ServicesSection from './components/ServicesSection';
+import EngineShowcase from './components/EngineShowcase';
+import ProofLocation from './components/ProofLocation';
+import BookingTerminal from './components/BookingTerminal';
+
+gsap.registerPlugin(ScrollTrigger, Flip);
+gsap.ticker.lagSmoothing(0);
+gsap.ticker.fps(60);
+// Collapsing mobile address bars must not re-run pin math mid-scroll.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
+export default function App() {
+  const { copy } = useLanguage();
+  const reduced = useMotionPreference();
+  const [service, setService] = useState<ServiceKey>('diagnostics');
+  const logo = useRef<HTMLDivElement>(null), heroSlot = useRef<HTMLDivElement>(null), navSlot = useRef<HTMLSpanElement>(null);
+  const heroBack = useRef<HTMLDivElement>(null), heroFront = useRef<HTMLDivElement>(null);
+  const firstField = useRef<HTMLInputElement>(null);
+
+  const openBooking = (key?: ServiceKey) => {
+    if (key) setService(key);
+    document.getElementById('book')?.scrollIntoView({ behavior: motion.reduced ? 'instant' : 'smooth', block: 'start' });
+    firstField.current?.focus({ preventScroll: true });
+  };
+
+  useEffect(() => {
+    let frame = 0, resizeFrame = 0, lastY = window.scrollY, lastTime = performance.now(), docked = false, alive = true;
+    let heroHeight = window.innerHeight, scrollRange = 1;
+    const coarse = matchMedia('(pointer: coarse)');
+    const measure = () => {
+      // Layout reads happen here (resize), never inside the per-frame scroll path.
+      heroHeight = heroBack.current?.parentElement?.offsetHeight ?? window.innerHeight;
+      scrollRange = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      motion.mobile = window.innerWidth < 768;
+      motion.coarse = coarse.matches;
+    };
+    const pointer = (event: PointerEvent) => {
+      if (event.pointerType !== 'mouse') return;
+      motion.pointerX = event.clientX / window.innerWidth * 2 - 1;
+      motion.pointerY = event.clientY / window.innerHeight * 2 - 1;
+    };
+    const orient = (event: DeviceOrientationEvent) => {
+      if (!motion.gyroAllowed || motion.reduced) return;
+      motion.pointerX = Math.max(-1, Math.min(1, (event.gamma ?? 0) / 35));
+      motion.pointerY = Math.max(-1, Math.min(1, ((event.beta ?? 45) - 45) / 45));
+    };
+    function dock(next: boolean) {
+      const badge = logo.current;
+      if (next === docked || !badge) return;
+      docked = next;
+      const state = Flip.getState(badge);
+      (next ? navSlot : heroSlot).current?.appendChild(badge);
+      badge.classList.toggle('docked', next);
+      Flip.from(state, {
+        duration: motion.reduced ? 0 : .85, ease: 'power3.inOut', scale: true, absolute: true, prune: true,
+        onComplete: () => { if (logo.current) gsap.set(logo.current, { clearProps: 'all' }); },
+      });
+    }
+    const update = () => {
+      frame = 0;
+      if (!alive) return;
+      const now = performance.now(), y = window.scrollY;
+      motion.velocity = (y - lastY) / Math.max(16, now - lastTime) * 1000;
+      motion.scroll = y / scrollRange;
+      lastY = y; lastTime = now;
+      // Hero parallax planes: background 0.25×, foreground HUD 1.35× (compositor transforms only).
+      if (y <= heroHeight * 1.1) {
+        const depth = motion.reduced ? 0 : y;
+        if (heroBack.current) heroBack.current.style.transform = `translate3d(0, ${(depth * .75).toFixed(1)}px, 0)`;
+        if (heroFront.current) heroFront.current.style.transform = `translate3d(0, ${(depth * -.35).toFixed(1)}px, 0)`;
+      }
+      dock(motion.scroll >= .15);
+    };
+    const scroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    const resize = () => {
+      if (!resizeFrame) resizeFrame = requestAnimationFrame(() => { resizeFrame = 0; measure(); ScrollTrigger.refresh(); scroll(); });
+    };
+    measure();
+    scroll();
+    window.addEventListener('scroll', scroll, { passive: true });
+    window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('pointermove', pointer, { passive: true });
+    window.addEventListener('deviceorientation', orient, { passive: true });
+    coarse.addEventListener('change', measure);
+    // Fonts and lazy sections change document height after first paint.
+    const heightWatch = new ResizeObserver(() => { scrollRange = Math.max(1, document.documentElement.scrollHeight - window.innerHeight); });
+    heightWatch.observe(document.body);
+    return () => {
+      alive = false;
+      cancelAnimationFrame(frame); cancelAnimationFrame(resizeFrame);
+      window.removeEventListener('scroll', scroll);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('pointermove', pointer);
+      window.removeEventListener('deviceorientation', orient);
+      coarse.removeEventListener('change', measure);
+      heightWatch.disconnect();
+      if (logo.current && heroSlot.current) heroSlot.current.appendChild(logo.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!reduced) return;
+    motion.pointerX = motion.pointerY = 0;
+    heroBack.current?.style.removeProperty('transform');
+    heroFront.current?.style.removeProperty('transform');
+  }, [reduced]);
+
+  return <>
+    <a className="skip-link" href="#main">{copy.skip}</a>
+    <Navbar ref={navSlot} onBook={() => openBooking()} />
+    <main id="main">
+      <Hero reduced={reduced} onBook={() => openBooking()} logo={logo} logoSlot={heroSlot} back={heroBack} front={heroFront} />
+      <ServicesSection service={service} onSelect={setService} onBook={openBooking} />
+      <EngineShowcase reduced={reduced} onBook={() => openBooking()} />
+      <ProofLocation />
+      <BookingTerminal ref={firstField} service={service} onService={setService} reduced={reduced} />
+    </main>
+    <footer>
+      <a className="brand" href="#home">M&D <span className="brand-small">MULTI-SERVICE</span></a>
+      <span className="mono">{copy.footer.tagline}</span>
+      <span className="mono footer-name">{copy.hero.name}</span>
+      <a href="mailto:md_multiservice@yahoo.com" className="footer-email">{copy.footer.email} <ArrowUpRight size={14} /></a>
+      <span className="mono copyright">© {new Date().getFullYear()} M&D MULTI-SERVICE · 419 N BOYLE AVE, LOS ANGELES, CA 90033 · (323) 354-4795</span>
+    </footer>
+  </>;
+}

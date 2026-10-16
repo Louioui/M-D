@@ -1,0 +1,118 @@
+/* Pinned engine tour. Three Z planes: watermark (0.25×), WebGL (1×), HUD (1.35×). */
+.engine-tour{height:500svh;position:relative;background:#0d0f13;border-block:1px solid #ffffff28}
+.engine-tour-stage{
+  --top:calc(80px + env(safe-area-inset-top));--stacked:0;
+  position:sticky;top:0;height:100svh;height:100dvh;min-height:560px;overflow:hidden;isolation:isolate;
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;gap:14px;
+  padding:calc(var(--top) + 18px) 4% calc(12px + env(safe-area-inset-bottom));
+  background:radial-gradient(ellipse 60% 55% at 50% 58%,#1b263b66,transparent 70%),radial-gradient(ellipse at 50% 100%,#e6394612,transparent 50%),repeating-linear-gradient(135deg,transparent 0 3px,#ffffff03 3px 4px),#0d0f13}
+.engine-watermark{position:absolute;z-index:0;left:50%;top:50%;margin:-.5em 0 0 -.62em;font-family:var(--display);font-weight:900;font-size:min(62vh,48vw);line-height:1;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px #8d99ae1c;pointer-events:none;user-select:none;will-change:transform}
+.engine-tour-topline{grid-row:1;position:relative;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:12px;border-bottom:1px solid #ffffff30;color:#dededb;font-size:10px;letter-spacing:1.5px}
+.engine-tour-topline>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.engine-count{white-space:nowrap}
+.engine-card-readout{display:none;font-size:8.5px;letter-spacing:.8px;color:#dfe3ea;margin:-2px 0 10px}
+.engine-card-readout b{color:#e63946;margin-right:6px;font-weight:600}
+.engine-visual-stage{grid-row:2;grid-column:1;position:relative;min-width:0;min-height:0;z-index:1}
+.engine-studio-light{position:absolute;inset:4% 18% 0;background:radial-gradient(ellipse at 50% 72%,#ffffff0b,transparent 62%);pointer-events:none}
+.engine-stage-canvas{position:absolute;inset:0}
+.three-canvas{position:relative;width:100%;height:100%}
+.engine-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8d99ae;font-family:var(--display);font-size:34px;font-weight:700}
+
+/* Tools: shading mode switch + opt-in touch inspection. */
+.engine-tools{position:absolute;top:6px;right:0;z-index:25;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.engine-modes{display:flex;border:1px solid #8d99ae55;background:#0d0f13d9;backdrop-filter:blur(10px)}
+.engine-modes>button{min-height:36px;padding:0 12px;background:none;color:#a9b2c2;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:1.1px;border-right:1px solid #8d99ae40;transition:color .2s,background .2s}
+.engine-modes>button:last-child{border-right:0}
+.engine-modes>button:hover{color:#fff}
+.engine-modes>button.is-active{background:#e63946;color:#fff}
+.engine-inspect{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;background:#0d0f13d9;border:1px solid #8d99ae55;color:#dfe3ea;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:1.1px}
+.engine-inspect.is-active{border-color:#e63946;color:#ff8a92}
+.engine-inspect-hint{font-size:9px;color:#8d99ae;letter-spacing:1px}
+
+/* Reticle + leader are positioned by the render loop through transforms only. */
+.engine-leader{position:absolute;inset:0;width:100%;height:100%;z-index:14;pointer-events:none;overflow:visible}
+.engine-leader path{fill:none;stroke:#e63946;stroke-width:1.5;opacity:.9;filter:drop-shadow(0 0 4px #e6394699)}
+.engine-reticle{position:absolute;left:0;top:0;z-index:15;width:0;height:0;pointer-events:none;opacity:0;transition:opacity .25s;will-change:transform}
+.engine-reticle-ring,.engine-reticle-dot{position:absolute;left:0;top:0;border-radius:50%}
+.engine-reticle-ring{width:34px;height:34px;margin:-17px 0 0 -17px;border:1.5px solid #e63946;box-shadow:0 0 14px #e6394688;animation:reticle-pulse 1.6s cubic-bezier(.3,.6,.4,1) infinite}
+.engine-reticle-ring::before,.engine-reticle-ring::after{content:'';position:absolute;background:#e63946}
+.engine-reticle-ring::before{left:50%;top:-9px;bottom:-9px;width:1px;margin-left:-.5px;mask:linear-gradient(#000 0 9px,transparent 9px calc(100% - 9px),#000 calc(100% - 9px))}
+.engine-reticle-ring::after{top:50%;left:-9px;right:-9px;height:1px;margin-top:-.5px;mask:linear-gradient(90deg,#000 0 9px,transparent 9px calc(100% - 9px),#000 calc(100% - 9px))}
+.engine-reticle-dot{width:6px;height:6px;margin:-3px 0 0 -3px;background:#ff4b57;box-shadow:0 0 10px #ff4b57}
+@keyframes reticle-pulse{0%{transform:scale(.82);opacity:1}70%{transform:scale(1.18);opacity:.55}100%{transform:scale(.82);opacity:1}}
+.engine-readout{position:absolute;left:26px;top:-34px;white-space:nowrap;padding:6px 9px;font-size:9px;letter-spacing:1.1px;color:#f2f0eb;background:#0d0f13e6;border:1px solid #8d99ae40;border-left:2px solid #e63946}
+.engine-readout b{font-weight:600;color:#e63946;margin-right:8px}
+.hud-right .engine-readout{left:auto;right:26px;border-left:1px solid #8d99ae40;border-right:2px solid #e63946}
+
+/* Foreground glass HUD card (max-w-md), alternating sides on desktop. */
+.engine-hud-card{grid-row:2;grid-column:1;align-self:center;position:relative;z-index:20;width:min(28rem,34vw);will-change:transform;
+  background:linear-gradient(140deg,#1b263bcc,#111111d9 70%);backdrop-filter:blur(14px) saturate(1.15);-webkit-backdrop-filter:blur(14px) saturate(1.15);
+  border:1px solid #8d99ae33;box-shadow:0 8px 32px rgba(0,0,0,.9);padding:24px 26px}
+.engine-hud-card.side-left{justify-self:start;border-left:2px solid #e63946}
+.engine-hud-card.side-right{justify-self:end;border-right:2px solid #e63946}
+.engine-card-inner{will-change:transform}
+.engine-part{font-size:10px;letter-spacing:1.5px;color:#ff5a64;margin-bottom:14px}
+.engine-hook{font-family:var(--display);font-size:clamp(30px,3.1vw,50px);font-weight:800;line-height:.98;letter-spacing:-.3px;color:#f2f0eb;margin-bottom:16px;text-transform:uppercase}
+.engine-hook>span{color:#8d99ae}
+.engine-story{font-size:15px;line-height:1.65;color:#d9dce2;filter:drop-shadow(0 8px 32px rgba(0,0,0,.9))}
+.engine-tour-cta{border:0;border-top:1px solid #ffffff40;background:none;display:flex;justify-content:space-between;align-items:center;gap:15px;min-height:48px;width:100%;margin-top:18px;padding:12px 0 0;text-align:left;color:#ff5a64;font-size:15px;font-weight:600}
+.engine-tour-cta:hover{color:#fff}
+
+.engine-tour-footer{grid-row:3;position:relative;z-index:20;display:flex;align-items:stretch;gap:24px;border-top:1px solid #ffffff50;border-bottom:1px solid #ffffff30;background:#0d0f13e6;min-height:62px}
+.engine-chapters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));flex:1;min-width:0}
+.engine-chapter{position:relative;display:flex;align-items:center;gap:16px;min-height:48px;padding:16px 18px;background:none;color:#bdbdbb;font-family:var(--display);font-size:20px;font-weight:500;border-right:1px solid #ffffff30;text-align:left;min-width:0}
+.engine-chapter:first-child{padding-left:0}.engine-chapter:last-child{border-right:0}
+.engine-chapter-number{font-weight:600}.engine-chapter-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.engine-chapter.is-active{color:#ff4b57}.engine-chapter:hover{color:#fff}
+.engine-chapter-track{position:absolute;left:0;right:0;bottom:-1px;height:3px;overflow:hidden}
+.engine-chapter-track>span{display:block;width:100%;height:100%;background:#e63946;transform:scaleX(0);transform-origin:left;will-change:transform}
+.engine-step-controls{display:flex;align-items:center;gap:12px}
+.engine-step-controls>button{display:flex;align-items:center;justify-content:center;width:48px;height:48px;border:1px solid #f2f0eb;border-radius:50%;background:none;color:#f2f0eb;transition:background .2s,border-color .2s}
+.engine-step-controls>button:last-child{border-color:#e63946;color:#ff4b57}
+.engine-step-controls>button:hover:not(:disabled){background:#e6394620;border-color:#ff4b57}
+.engine-step-controls>button:disabled{opacity:.3;cursor:default}
+.engine-scroll-note{grid-row:4;font-size:8px;letter-spacing:1.5px;color:#8d99ae;text-align:center;margin:0}
+
+.loading-gauge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,84%);padding:18px 20px;border:1px solid #8d99ae40;background:#0d0f13e6;z-index:5}
+.loading-gauge-title{font-size:10px;letter-spacing:1.2px;color:#f2f0eb;margin-bottom:12px}
+.loading-gauge-track{height:6px;background:repeating-linear-gradient(90deg,#8d99ae26 0 6px,transparent 6px 8px);overflow:hidden}
+.loading-gauge-track>span{display:block;height:100%;background:#e63946;transform-origin:left;transition:transform .2s linear}
+.loading-gauge-meta{display:flex;justify-content:space-between;margin-top:10px;font-size:9px;color:#8d99ae}
+.scene-loading{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;font-size:10px;color:#eee;pointer-events:none}
+
+@media(min-width:1700px){.engine-hud-card{width:28rem;padding:30px 32px}.engine-story{font-size:17px}}
+@media(max-height:760px) and (min-aspect-ratio:6/5){.engine-tour-stage{gap:10px;padding-top:calc(var(--top) + 10px)}.engine-hook{font-size:clamp(28px,2.7vw,40px);margin-bottom:10px}.engine-story{font-size:14px;line-height:1.55}.engine-tour-footer{min-height:54px}.engine-chapter{padding-block:12px}}
+
+/* Portrait phones and tablets (aspect ≤ 1.2): engine in the top 58%, HUD card in the bottom 42%. */
+@media(max-aspect-ratio:6/5){
+  .engine-tour-stage{--stacked:1;--top:calc(68px + env(safe-area-inset-top));grid-template-rows:auto calc(58dvh - var(--top) - 44px) minmax(0,1fr) auto auto;gap:10px;padding-inline:5%;min-height:0}
+  .engine-hud-card{grid-row:3;align-self:stretch;justify-self:stretch!important;width:auto;padding:16px 18px;overflow:hidden;border-left:2px solid #e63946!important;border-right:1px solid #8d99ae33!important}
+  .engine-leader{display:none}
+  .engine-tour-footer{grid-row:4}
+  .engine-scroll-note{grid-row:5}
+  .engine-hook{font-size:clamp(24px,6.4vw,40px);margin-bottom:10px}
+  .engine-story{font-size:14px;line-height:1.55}
+  .engine-part{margin-bottom:8px}
+  .engine-tools{top:0}
+  .engine-readout{display:none}
+  .engine-card-readout{display:block}
+}
+@media(max-aspect-ratio:6/5) and (min-width:700px){.engine-tour-stage{padding-inline:6%}.engine-hud-card{padding:22px 26px}.engine-story{font-size:16px}}
+@media(max-width:767px){
+  .engine-tour-topline{font-size:8px;letter-spacing:1px;padding-bottom:9px}
+  .engine-modes>button{min-height:48px;padding:0 9px;font-size:8px;letter-spacing:.6px}
+  .engine-inspect{min-height:48px;font-size:8px;letter-spacing:.6px}
+  .engine-tools{left:0;right:0;flex-direction:row;justify-content:space-between;align-items:flex-start}
+  .engine-inspect-hint{display:none}
+  .engine-stage-canvas{top:56px}
+  .engine-hud-card .engine-tour-cta{display:none}
+  .engine-tour-footer{gap:6px;min-height:56px}
+  .engine-chapter{flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;font-size:12px;line-height:1.1;padding:6px 6px}
+  .engine-chapter-number{font-size:13px}
+  .engine-step-controls{gap:4px}
+  .engine-scroll-note{font-size:6px;letter-spacing:1px}
+  .engine-tour-cta{min-height:44px;margin-top:10px;padding-top:8px;font-size:13px}
+}
+@media(max-width:380px){.engine-chapter{font-size:10.5px;padding-inline:4px}.engine-modes>button{padding:0 6px;font-size:7.5px}}
+@media(max-aspect-ratio:6/5) and (max-height:720px){.engine-tour-cta{display:none}.engine-story{font-size:13px;line-height:1.5}.engine-scroll-note{display:none}}
+@media(prefers-reduced-motion:reduce){.engine-card-inner,.engine-chapter-track>span,.engine-watermark,.engine-hud-card{will-change:auto}.engine-reticle-ring{animation:none}.engine-reticle{transition:none}.loading-gauge-track>span{transition:none}}

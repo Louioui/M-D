@@ -19,7 +19,7 @@ npm run preview
 
 ## Experience
 
-- Actual supplied 3D badge, mouse tilt and opt-in device orientation; GSAP Flip docks the same live canvas into the navigation at 15% total document scroll. Rotation follows scroll velocity and settles when scrolling stops.
+- Actual supplied 3D badge, mouse tilt and opt-in device orientation; GSAP Flip docks the same live canvas into the navigation at 15% total document scroll. Only the independent rear gear rotates: a slow 60-second idle revolution accelerates or reverses with scroll velocity, while the lettering, central plate and crossed wrenches stay upright. The gear continues after docking.
 - Engine scene is loaded near the tour. A 500vh section keeps its 100vh stage sticky for 400vh of camera travel. Four chapter buttons also provide direct navigation.
 - The background watermark moves at 0.25x; the foreground HUD cards use an additional 0.35x offset for 1.35x apparent travel and alternate sides. Motion updates use GSAP's frame ticker and a single RAF-batched scroll/resize path. React state changes only on chapter changes, never every frame.
 - WebGL uses demand rendering, capped pixel density, local Draco decoders, and no external HDR downloads. No claim is made that all hardware or network conditions achieve 60fps or instantaneous loading.
@@ -47,3 +47,12 @@ Original files remain untouched one level above this project. Geometry inspectio
 `npm run optimize` uses glTF Transform, meshoptimizer simplification (8% badge / 2.5% engine with 0.02 error limit), 2048px WebP textures, and Draco compression. Originals are not included in deployment. `design/asset-report.json` records measured sizes. Decoders ship locally under `public/draco/` with the Three.js distribution's license in `public/draco/LICENSE`.
 
 `design/concept.png` is the generated visual reference. The supplied original M&D badge replaces the conceptual logo. Typography, red/black palette, industrial composition, outlined engine watermark and HUDs follow that direction. The booking form is presented in the requested slide-over vault rather than inline beside the location. The service list gives visitors a direct way to understand and request work.
+
+
+## Articulated gear logo
+
+The live badge uses `public/models/logo-articulated.glb` (approximately 1.57 MB), with sibling nodes `StationaryBadge` and `GearAssembly`. The fused original rear ring was removed around the foreground silhouette and rebuilt as an independent, beveled twelve-tooth steel ring with machined races and twelve rivets. The original lettering, plate, wrenches and their texture coordinates are retained. The rebuilt gear has a subtly brushed steel finish rather than the original baked ring texture.
+
+Run `npm run articulate-logo` to regenerate it from `../M&D3dmodel.glb`, or pass an alternate source: `npm run articulate-logo -- /absolute/path/to/source.glb`. The source GLB is never overwritten. `scripts/articulate-logo.mjs` contains the documented silhouette masks, geometry dimensions and material settings. The GLB also includes a standalone 60-second `Gear idle` animation clip targeting only `GearAssembly`; the website controls the same gear directly for scroll responsiveness.
+
+`src/Scene.tsx` controls idle speed (`IDLE_SPEED`), the scroll speed multiplier and maximum speed. It uses time-based damping without React state updates on animation frames. Rendering pauses when the canvas leaves the viewport or the tab is hidden. Reduced motion resets the rig to a still front-facing pose; disabling it resumes idle motion. The original static badge remains as the WebGL fallback.

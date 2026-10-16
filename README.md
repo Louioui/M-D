@@ -21,7 +21,7 @@ npm run preview
 
 - Actual supplied 3D badge, mouse tilt and opt-in device orientation; GSAP Flip docks the same live canvas into the navigation at 15% total document scroll. Rotation follows scroll velocity and settles when scrolling stops.
 - Engine scene is loaded near the tour. A 500vh section keeps its 100vh stage sticky for 400vh of camera travel. Four chapter buttons also provide direct navigation.
-- The background watermark moves at a slower rate; the foreground HUD cards alternate sides. Motion updates use GSAP's frame ticker and a single RAF-batched scroll/resize path. React state changes only on chapter changes, never every frame.
+- The background watermark moves at 0.25x; the foreground HUD cards use an additional 0.35x offset for 1.35x apparent travel and alternate sides. Motion updates use GSAP's frame ticker and a single RAF-batched scroll/resize path. React state changes only on chapter changes, never every frame.
 - WebGL uses demand rendering, capped pixel density, local Draco decoders, and no external HDR downloads. No claim is made that all hardware or network conditions achieve 60fps or instantaneous loading.
 - Live `prefers-reduced-motion` support disables orbit, pointer tilt, parallax, smooth scrolling, and animated drawer entrance. Small screens use shallower camera offsets and compact HUDs. Form, navigation, and location remain usable without WebGL.
 - Native modal dialog provides focus containment, Escape dismissal, and focus restoration. Vehicle and name inputs are validated before message generation.

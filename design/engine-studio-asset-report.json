@@ -1,0 +1,29 @@
+{
+  "source": "../EngineM&D.glb",
+  "sourceBytes": 211497724,
+  "limitations": "Single fused scan/reconstruction mesh; no claim of separated CAD parts or manifold topology.",
+  "variants": [
+    {
+      "target": "public/models/engine-studio.glb",
+      "bytes": 8139088,
+      "triangles": 411490,
+      "vertices": 322191,
+      "colorAndNormalSize": 4096,
+      "ormSize": 1024,
+      "aoRaysPerVertex": 12,
+      "aoMin": 0.5259565114974976,
+      "aoMean": 0.7881390190899726
+    },
+    {
+      "target": "public/models/engine-mobile.glb",
+      "bytes": 4184024,
+      "triangles": 197475,
+      "vertices": 177131,
+      "colorAndNormalSize": 2048,
+      "ormSize": 1024,
+      "aoRaysPerVertex": 12,
+      "aoMin": 0.5258992314338684,
+      "aoMean": 0.7909748945078267
+    }
+  ]
+}

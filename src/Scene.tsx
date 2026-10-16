@@ -1,9 +1,10 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer, useGLTF } from '@react-three/drei';
-import { BufferGeometry, Float32BufferAttribute, Group, MathUtils, Vector3 } from 'three';
+import { ACESFilmicToneMapping, BufferGeometry, Float32BufferAttribute, Group, MathUtils, Vector3 } from 'three';
 import { motion, subscribeTourProgress } from './motion';
 import { sampleEnginePath, ENGINE_FOCUS, chapterAt } from './enginePath.mjs';
+import { prepareEngineMaterials } from './engineMaterials';
 
 const LOGO_MODEL = '/models/logo-articulated.glb';
 const IDLE_SPEED = Math.PI / 30; // One revolution per minute.
@@ -80,12 +81,17 @@ function LogoModel({ reduced }: { reduced: boolean }) {
 }
 
 function EngineModel({ reduced }: { reduced: boolean }) {
-  const { scene } = useGLTF('/models/engine.glb', '/draco/');
-  const model = useMemo(() => scene.clone(true), [scene]);
+  // Choose before fetching: phones never download the desktop model or 4K maps.
+  const [compact] = useState(() => window.matchMedia('(max-width: 767px)').matches ||
+    Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData));
+  const { scene } = useGLTF(compact ? '/models/engine-mobile.glb' : '/models/engine-studio.glb', '/draco/');
+  const prepared = useMemo(() => prepareEngineMaterials(scene), [scene]);
+  const model = prepared.model;
+  useEffect(() => prepared.dispose, [prepared]);
   const { visible, invalidate } = useSceneActivity(reduced);
   const progress = useRef(0), lean = useRef({ x: 0, y: 0 });
   const stage = useRef<Group>(null), marker = useRef<Group>(null);
-  const vectors = useMemo(() => ({ position: new Vector3(), target: new Vector3(), focus: new Vector3() }), []);
+  const vectors = useMemo(() => ({ position: new Vector3(), target: new Vector3(), focus: new Vector3(), direction: new Vector3(), right: new Vector3(), up: new Vector3(), corner: new Vector3() }), []);
   const ticks = useMemo(() => {
     const points: number[] = [];
     for (let i = 0; i < 48; i++) {
@@ -111,10 +117,26 @@ function EngineModel({ reduced }: { reduced: boolean }) {
     sampleEnginePath(progress.current, vectors.position, vectors.target, motion.mobile);
     vectors.position.x += lean.current.x;
     vectors.position.y += lean.current.y;
+    // Fit the real engine bounds, including during portrait and short-screen views.
+    // Solving distance in camera space prevents clipping without changing layout.
+    if ('fov' in camera && 'aspect' in camera) {
+      vectors.direction.copy(vectors.position).sub(vectors.target).normalize();
+      vectors.right.crossVectors(camera.up, vectors.direction).normalize();
+      vectors.up.crossVectors(vectors.direction, vectors.right);
+      const tanY = Math.tan(Number(camera.fov) * Math.PI / 360) * .94;
+      const tanX = tanY * Number(camera.aspect);
+      let distance = vectors.position.distanceTo(vectors.target);
+      for (const point of prepared.framing) {
+        vectors.corner.copy(point).sub(vectors.target);
+        distance = Math.max(distance, vectors.corner.dot(vectors.direction) +
+          Math.max(Math.abs(vectors.corner.dot(vectors.right)) / tanX, Math.abs(vectors.corner.dot(vectors.up)) / tanY));
+      }
+      vectors.position.copy(vectors.target).addScaledVector(vectors.direction, distance);
+    }
     camera.position.copy(vectors.position);
     camera.lookAt(vectors.target);
     const focus = ENGINE_FOCUS[chapterAt(reduced ? 0 : motion.tour)];
-    vectors.focus.set(focus[0] * 1.1, focus[1] * 1.1, focus[2] * 1.1);
+    vectors.focus.set(focus[0] * 1.22, focus[1] * 1.22, focus[2] * 1.22);
     if (marker.current) {
       if (reduced) marker.current.position.copy(vectors.focus);
       else marker.current.position.lerp(vectors.focus, 1 - Math.exp(-delta * 9));
@@ -127,7 +149,7 @@ function EngineModel({ reduced }: { reduced: boolean }) {
     if (!reduced && unsettled) invalidate();
   });
   return <>
-    <group name="EngineTourModel" scale={1.1}><primitive object={model} /></group>
+    <group name="EngineTourModel" scale={1.22}><primitive object={model} /></group>
     <group ref={stage} name="EngineTurntable">
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.205, 0]}>
         <circleGeometry args={[1.1, 64]} /><meshBasicMaterial color="#050505" transparent opacity={.65} depthWrite={false} />
@@ -165,19 +187,25 @@ export default function Scene({ kind, reduced }: { kind: 'logo' | 'engine'; redu
     : <div className="engine-fallback">Your engine. In good hands.</div>;
   return <SceneBoundary fallback={fallback}><div style={{ position: 'relative', width: '100%', height: '100%' }}>
     {kind === 'engine' && !ready && <div className="scene-loading mono" role="status">LOADING THE ENGINE…</div>}
-    <Canvas dpr={[1, 1.5]} frameloop="demand" resize={{ offsetSize: true }}
+    <Canvas dpr={[1, kind === 'engine' && window.matchMedia('(max-width: 767px)').matches ? 1.25 : 1.5]} frameloop="demand" resize={{ offsetSize: true }}
       camera={{ position: kind === 'logo' ? [0, 0, 6.5] : [2.5, 1.5, 3.7], fov: 38 }}
-      gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }} fallback={fallback}
+      gl={{ alpha: true, antialias: true, powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping }} fallback={fallback}
       aria-label={kind === 'logo' ? 'M&D badge with an independently rotating steel gear' : 'Interactive four-zone engine tour'}>
-      <ambientLight intensity={kind === 'engine' ? .75 : 1.4} />
-      <directionalLight position={[3, 5, 5]} intensity={kind === 'engine' ? 2.8 : 3.5} />
-      <directionalLight position={[-4, 1, 2]} intensity={kind === 'engine' ? 1.5 : 2} />
-      <pointLight position={[3, 1, -3]} color="#ff2525" intensity={24} />
+      <ambientLight intensity={kind === 'engine' ? .3 : 1.4} />
+      {kind === 'engine' ? <>
+        <directionalLight name="Warm studio key" position={[3, 5, 4]} color="#fff0dc" intensity={2.4} />
+        <directionalLight name="Cool studio fill" position={[-4, 1.5, 2]} color="#b6d0ef" intensity={1.15} />
+        <directionalLight name="Edge separation rim" position={[1, 3, -4]} color="#e3eeff" intensity={3} />
+      </> : <>
+        <directionalLight position={[3, 5, 5]} intensity={3.5} />
+        <directionalLight position={[-4, 1, 2]} intensity={2} />
+        <pointLight position={[3, 1, -3]} color="#ff2525" intensity={24} />
+      </>}
       <Suspense fallback={null}>
-        <Environment resolution={128}>
-          <Lightformer intensity={4} position={[0, 4, 3]} scale={[8, 2, 1]} />
-          <Lightformer intensity={2} position={[-4, 0, 1]} scale={[2, 8, 1]} />
-          <Lightformer intensity={2} position={[4, 0, -2]} scale={[2, 8, 1]} />
+        <Environment resolution={kind === 'engine' ? 256 : 128} frames={1}>
+          <Lightformer intensity={kind === 'engine' ? 2 : 4} color={kind === 'engine' ? '#fff0de' : '#ffffff'} position={[0, 4, 3]} scale={kind === 'engine' ? [6, 2, 1] : [8, 2, 1]} />
+          <Lightformer intensity={kind === 'engine' ? 1 : 2} color={kind === 'engine' ? '#b5d3ff' : '#ffffff'} position={kind === 'engine' ? [-4, 1, 1] : [-4, 0, 1]} rotation={[0, kind === 'engine' ? Math.PI / 2 : 0, 0]} scale={kind === 'engine' ? [2, 6, 1] : [2, 8, 1]} />
+          <Lightformer intensity={kind === 'engine' ? 3 : 2} position={kind === 'engine' ? [3, 2, -3] : [4, 0, -2]} rotation={[0, kind === 'engine' ? -Math.PI / 4 : 0, 0]} scale={kind === 'engine' ? [1, 5, 1] : [2, 8, 1]} />
         </Environment>
         {kind === 'logo' ? <LogoModel reduced={reduced} /> : <EngineModel reduced={reduced} />}
         <SceneReady onReady={onReady} />

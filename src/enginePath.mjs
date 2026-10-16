@@ -1,15 +1,15 @@
 import { CatmullRomCurve3, Vector3 } from 'three';
 
-// The camera travels almost one full revolution, with each quarter aligned to a
-// chapter. Centripetal interpolation avoids the corner changes of linear pans.
+// Guided inspection: high cover, front intake, right timing case, low flywheel.
+// Keep the useful mechanical faces in view instead of circling the empty rear.
 const positions = [
-  [2.5, 1.65, 4.4], [-.2, 1.6, 4.1], [-3.7, 1.3, 2.8],
-  [-4, 1.4, -1.5], [-.6, 1.9, -4], [3.4, 1.4, -2.6],
-  [3.3, .85, 2.5], [1.4, 1, 4.5], [2.9, 1.3, 4.7],
+  [2.6, 2.5, 4.5], [.8, 2, 4.3], [-1.4, 1.3, 4.1],
+  [-2.7, 1, 3.6], [.6, 1.6, 4.1], [3.4, 1.2, 2.5],
+  [4.1, .1, 1.8], [3.4, -.1, 2.7], [3.1, .3, 3.7],
 ];
 const targets = [
-  [0, .1, 0], [-.12, .2, .1], [-.15, .1, .15], [.05, .12, 0],
-  [.1, .3, -.1], [.1, .1, -.1], [.15, -.2, 0], [0, -.15, .15], [0, .1, 0],
+  [0, .3, 0], [-.12, .25, .1], [-.15, .1, .3], [-.1, .08, .2],
+  [.25, .2, 0], [.25, .1, -.1], [.3, -.15, 0], [.25, -.25, .1], [.15, -.15, .1],
 ];
 const orbit = new CatmullRomCurve3(positions.map(p => new Vector3(...p)), false, 'centripetal');
 const aim = new CatmullRomCurve3(targets.map(p => new Vector3(...p)), false, 'centripetal');
@@ -23,5 +23,6 @@ export function sampleEnginePath(progress, position, target, mobile = false) {
   orbit.getPoint(p, position);
   aim.getPoint(p, target);
   position.multiplyScalar(mobile ? .86 : .88);
+  if (mobile) position.x *= .72;
   target.y -= .15;
 }

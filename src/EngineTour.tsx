@@ -52,8 +52,8 @@ export default function EngineTour({ reduced, onBook }: { reduced: boolean; onBo
 
   useEffect(() => {
     if (!copy.current) return;
-    const tween = gsap.fromTo(copy.current, { y: reduced ? 0 : 12, opacity: 1 }, {
-      y: 0, opacity: 1, force3D: true, duration: reduced ? 0 : .4, ease: 'power2.out', overwrite: true,
+    const tween = gsap.fromTo(copy.current, { x: reduced ? 0 : (active % 2 ? 18 : -18), y: reduced ? 0 : 8, opacity: 1 }, {
+      x: 0, y: 0, opacity: 1, force3D: true, duration: reduced ? 0 : .55, ease: 'power2.out', overwrite: true,
     });
     return () => { tween.kill(); };
   }, [active, reduced]);

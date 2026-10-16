@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "optimize": "node scripts/optimize.mjs",
     "test": "node --test src/*.test.mjs scripts/*.test.mjs",
-    "articulate-logo": "node scripts/articulate-logo.mjs"
+    "articulate-logo": "node scripts/articulate-logo.mjs",
+    "enhance-engine": "node scripts/enhance-engine.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -31,10 +32,11 @@
     "@types/three": "^0.180.0",
     "@vitejs/plugin-react": "^5.0.4",
     "draco3dgltf": "^1.5.7",
+    "meshoptimizer": "^0.22.0",
     "playwright": "^1.56.0",
     "sharp": "^0.35.5",
+    "three-mesh-bvh": "0.8.3",
     "typescript": "~5.9.3",
-    "vite": "^7.1.9",
-    "meshoptimizer": "^0.22.0"
+    "vite": "^7.1.9"
   }
 }

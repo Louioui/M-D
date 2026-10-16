@@ -1,8 +1,9 @@
-import { Component, Suspense, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer, useGLTF } from '@react-three/drei';
-import { Group, MathUtils, Vector3 } from 'three';
-import { motion } from './motion';
+import { BufferGeometry, Float32BufferAttribute, Group, MathUtils, Vector3 } from 'three';
+import { motion, subscribeTourProgress } from './motion';
+import { sampleEnginePath, ENGINE_FOCUS, chapterAt } from './enginePath.mjs';
 
 const LOGO_MODEL = '/models/logo-articulated.glb';
 const IDLE_SPEED = Math.PI / 30; // One revolution per minute.
@@ -78,32 +79,71 @@ function LogoModel({ reduced }: { reduced: boolean }) {
   return <group ref={tilt} scale={1.38}><primitive object={badge} /></group>;
 }
 
-const CAMERA: { position: [number, number, number]; target: [number, number, number] }[] = [
-  { position: [2.5, 1.5, 3.7], target: [0, .25, 0] },
-  { position: [-2.9, .55, 3.3], target: [-.15, .05, 0] },
-  { position: [2.8, 1.5, 2.7], target: [.1, .35, 0] },
-  { position: [1, -.4, 3.9], target: [0, -.35, 0] },
-  { position: [.4, -.3, 3.7], target: [0, -.3, 0] },
-];
-
 function EngineModel({ reduced }: { reduced: boolean }) {
   const { scene } = useGLTF('/models/engine.glb', '/draco/');
   const model = useMemo(() => scene.clone(true), [scene]);
-  const { visible } = useSceneActivity(reduced);
-  const vectors = useMemo(() => ({ desired: new Vector3(), temp: new Vector3(), target: new Vector3() }), []);
-  useFrame(({ camera }) => {
+  const { visible, invalidate } = useSceneActivity(reduced);
+  const progress = useRef(0), lean = useRef({ x: 0, y: 0 });
+  const stage = useRef<Group>(null), marker = useRef<Group>(null);
+  const vectors = useMemo(() => ({ position: new Vector3(), target: new Vector3(), focus: new Vector3() }), []);
+  const ticks = useMemo(() => {
+    const points: number[] = [];
+    for (let i = 0; i < 48; i++) {
+      const angle = i / 48 * Math.PI * 2, inner = i % 4 === 0 ? 1.43 : 1.49;
+      points.push(Math.cos(angle) * inner, -1.19, Math.sin(angle) * inner,
+        Math.cos(angle) * 1.57, -1.19, Math.sin(angle) * 1.57);
+    }
+    return new BufferGeometry().setAttribute('position', new Float32BufferAttribute(points, 3));
+  }, []);
+  useEffect(() => () => { ticks.dispose(); }, [ticks]);
+  useEffect(() => subscribeTourProgress(() => {
+    if (visible.current && !document.hidden) invalidate();
+  }), [visible, invalidate]);
+
+  useFrame(({ camera }, frameDelta) => {
     if (!visible.current || document.hidden) return;
-    const progress = reduced ? 0 : motion.tour;
-    const index = Math.min(3, Math.floor(progress * 4));
-    const blend = Math.min(1, progress * 4 - index);
-    const a = CAMERA[index], b = CAMERA[index + 1];
-    vectors.desired.set(...a.position).lerp(vectors.temp.set(...b.position), blend);
-    if (motion.mobile) { vectors.desired.x *= .45; vectors.desired.multiplyScalar(1.17); }
-    camera.position.copy(vectors.desired);
-    vectors.target.set(...a.target).lerp(vectors.temp.set(...b.target), blend);
+    const delta = Math.min(frameDelta, .1);
+    progress.current = reduced ? 0 : MathUtils.damp(progress.current, motion.tour, 11, delta);
+    const x = reduced || motion.mobile ? 0 : motion.pointerX * .1;
+    const y = reduced || motion.mobile ? 0 : motion.pointerY * .055;
+    lean.current.x = reduced ? 0 : MathUtils.damp(lean.current.x, x, 7, delta);
+    lean.current.y = reduced ? 0 : MathUtils.damp(lean.current.y, y, 7, delta);
+    sampleEnginePath(progress.current, vectors.position, vectors.target, motion.mobile);
+    vectors.position.x += lean.current.x;
+    vectors.position.y += lean.current.y;
+    camera.position.copy(vectors.position);
     camera.lookAt(vectors.target);
+    const focus = ENGINE_FOCUS[chapterAt(reduced ? 0 : motion.tour)];
+    vectors.focus.set(focus[0] * 1.1, focus[1] * 1.1, focus[2] * 1.1);
+    if (marker.current) {
+      if (reduced) marker.current.position.copy(vectors.focus);
+      else marker.current.position.lerp(vectors.focus, 1 - Math.exp(-delta * 9));
+      marker.current.quaternion.copy(camera.quaternion);
+    }
+    if (stage.current) stage.current.rotation.y = reduced ? 0 : -progress.current * Math.PI * .3;
+    const unsettled = Math.abs(progress.current - motion.tour) > .00003 ||
+      Math.abs(lean.current.x - x) + Math.abs(lean.current.y - y) > .0001 ||
+      (marker.current ? marker.current.position.distanceTo(vectors.focus) > .001 : false);
+    if (!reduced && unsettled) invalidate();
   });
-  return <group scale={1.1}><primitive object={model} /></group>;
+  return <>
+    <group name="EngineTourModel" scale={1.1}><primitive object={model} /></group>
+    <group ref={stage} name="EngineTurntable">
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.205, 0]}>
+        <circleGeometry args={[1.1, 64]} /><meshBasicMaterial color="#050505" transparent opacity={.65} depthWrite={false} />
+      </mesh>
+      {[1.15, 1.36, 1.57].map((radius, i) => <mesh key={radius} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]}>
+        <ringGeometry args={[radius, radius + (i === 2 ? .008 : .004), 128]} />
+        <meshBasicMaterial color={i === 1 ? '#787878' : '#ed2429'} transparent opacity={i === 2 ? .85 : .4} side={2} depthWrite={false} />
+      </mesh>)}
+      <lineSegments geometry={ticks}><lineBasicMaterial color="#8d6767" transparent opacity={.7} depthWrite={false} /></lineSegments>
+    </group>
+    <group ref={marker} name="EngineFocusMarker" renderOrder={20}>
+      <mesh renderOrder={20}><ringGeometry args={[.075, .082, 48]} /><meshBasicMaterial color="#ff343b" transparent opacity={.95} depthTest={false} depthWrite={false} /></mesh>
+      <mesh renderOrder={20}><ringGeometry args={[.105, .108, 48]} /><meshBasicMaterial color="#ff343b" transparent opacity={.4} depthTest={false} depthWrite={false} /></mesh>
+      <mesh renderOrder={20}><circleGeometry args={[.018, 16]} /><meshBasicMaterial color="#ff343b" depthTest={false} depthWrite={false} /></mesh>
+    </group>
+  </>;
 }
 
 class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
@@ -112,18 +152,26 @@ class SceneBoundary extends Component<{ children: ReactNode; fallback: ReactNode
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
+function SceneReady({ onReady }: { onReady: () => void }) {
+  useEffect(onReady, [onReady]);
+  return null;
+}
+
 export default function Scene({ kind, reduced }: { kind: 'logo' | 'engine'; reduced: boolean }) {
+  const [ready, setReady] = useState(false);
+  const onReady = useCallback(() => { setReady(true); }, []);
   const fallback = kind === 'logo'
     ? <img className="logo-fallback" src="/brand.webp" alt="M&D Multi-Service forged steel badge" />
-    : <div className="engine-fallback">Precision. From the inside out.</div>;
-  return <SceneBoundary fallback={fallback}>
+    : <div className="engine-fallback">Your engine. In good hands.</div>;
+  return <SceneBoundary fallback={fallback}><div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    {kind === 'engine' && !ready && <div className="scene-loading mono" role="status">LOADING THE ENGINE…</div>}
     <Canvas dpr={[1, 1.5]} frameloop="demand" resize={{ offsetSize: true }}
       camera={{ position: kind === 'logo' ? [0, 0, 6.5] : [2.5, 1.5, 3.7], fov: 38 }}
       gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }} fallback={fallback}
       aria-label={kind === 'logo' ? 'M&D badge with an independently rotating steel gear' : 'Interactive four-zone engine tour'}>
-      <ambientLight intensity={1.4} />
-      <directionalLight position={[3, 5, 5]} intensity={3.5} />
-      <directionalLight position={[-4, 1, 2]} intensity={2} />
+      <ambientLight intensity={kind === 'engine' ? .75 : 1.4} />
+      <directionalLight position={[3, 5, 5]} intensity={kind === 'engine' ? 2.8 : 3.5} />
+      <directionalLight position={[-4, 1, 2]} intensity={kind === 'engine' ? 1.5 : 2} />
       <pointLight position={[3, 1, -3]} color="#ff2525" intensity={24} />
       <Suspense fallback={null}>
         <Environment resolution={128}>
@@ -132,7 +180,8 @@ export default function Scene({ kind, reduced }: { kind: 'logo' | 'engine'; redu
           <Lightformer intensity={2} position={[4, 0, -2]} scale={[2, 8, 1]} />
         </Environment>
         {kind === 'logo' ? <LogoModel reduced={reduced} /> : <EngineModel reduced={reduced} />}
+        <SceneReady onReady={onReady} />
       </Suspense>
     </Canvas>
-  </SceneBoundary>;
+  </div></SceneBoundary>;
 }

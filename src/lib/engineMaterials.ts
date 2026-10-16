@@ -2,7 +2,8 @@ import {
   Mesh, MeshPhysicalMaterial, MeshStandardMaterial, Vector3,
   type IUniform, type Object3D, type Texture, type WebGLProgramParametersWithUniforms,
 } from 'three';
-import { createHeatUniforms, createPlasmaMaterial, HEAT_PARS, type HeatUniforms } from './plasmaMaterial.ts';
+import { createHeatUniforms, createPlasmaMaterial, HEAT_PARS, SHOCK_COLOR, type HeatUniforms } from './plasmaMaterial.ts';
+import { inject } from './shaderInject.ts';
 
 import type { InspectionMode } from './inspection.ts';
 const MODE_INDEX: Record<InspectionMode | 'zones', number> = { studio: 0, cad: 1, spec: 2, zones: 3 };
@@ -16,6 +17,9 @@ export interface EngineUniforms extends HeatUniforms {
   uFlyAxis: IUniform<Vector3>;
   uFlyRadius: IUniform<number>;
   uAniso: IUniform<number>;
+  /** 0..1 audio level from the opt-in engine idle; drives a micro-vibration. */
+  uVibe: IUniform<number>;
+  uVibeTime: IUniform<number>;
 }
 
 // Flexplate geometry measured from the supplied mesh (object space): machined
@@ -27,6 +31,8 @@ attribute float aCurvature;
 attribute float aCavity;
 uniform vec3 uFlyCenter;
 uniform vec3 uFlyAxis;
+uniform float uVibe;
+uniform float uVibeTime;
 varying vec3 vEnginePos;
 varying vec3 vEngineNormal;
 varying vec3 vEngineRadial;
@@ -40,7 +46,10 @@ vCurv = aCurvature;
 vCav = aCavity;
 vHeatWorld = (modelMatrix * vec4(position, 1.0)).xyz;
 vec3 flyOffset = position - uFlyCenter;
-vEngineRadial = (modelViewMatrix * vec4(flyOffset - dot(flyOffset, uFlyAxis) * uFlyAxis, 0.0)).xyz;`;
+vEngineRadial = (modelViewMatrix * vec4(flyOffset - dot(flyOffset, uFlyAxis) * uFlyAxis, 0.0)).xyz;
+// Audio-reactive micro-vibration: sub-millimetre (model scale) shiver along the
+// normal, phase-shifted by height so panels buzz instead of the block sliding.
+transformed += objectNormal * uVibe * 0.0016 * sin(position.y * 140.0 + position.x * 37.0 + uVibeTime * 61.0);`;
 
 const FRAGMENT_PARS = /* glsl */`
 varying vec3 vEnginePos;
@@ -61,6 +70,7 @@ uniform int uSurface;
 vec4 engineZones;
 float engineChrome;
 float engineHeight;
+float engineFilm;   // heat-tempered thin-film oxide (exhaust flank, head seam, bolt shoulders)
 float engineLine(float coordinate) {
   float width = max(fwidth(coordinate), 1e-4);
   return 1.0 - smoothstep(0.0, 1.0, abs(fract(coordinate - 0.5) - 0.5) / width);
@@ -100,6 +110,9 @@ const ZONES = /* glsl */`
   float seam = 1.0 - smoothstep(0.0, 0.03, abs(vEnginePos.y - 0.18));
   float heat = clamp(exhaust + seam * 0.5, 0.0, 1.0) * zA;
   diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.04, 0.98, 0.94), heat * 0.18);
+  // Bolt shoulders: the mid-curvature ring around a fastener head, not its crown.
+  float shoulder = zD * smoothstep(0.25, 0.55, vCurv) * (1.0 - smoothstep(0.8, 1.0, vCurv));
+  engineFilm = clamp(heat * 0.75 + shoulder * 0.6, 0.0, 1.0);
   // Oiled crevice occlusion: deepest in tooth roots, balancing holes and around bolt bases.
   diffuseColor.rgb *= 1.0 - clamp(vCav, 0.0, 1.0) * (0.3 + 0.38 * (zB + zD));
 }`;
@@ -130,6 +143,11 @@ const SURFACE = /* glsl */`
   // Keep 28% of the authored roughness variation so baked wear still reads.
   roughnessFactor = clamp(mix(roughnessFactor, zoneRough, 0.72), 0.04, 1.0);
   metalnessFactor = clamp(mix(metalnessFactor, zoneMetal, 0.8), 0.0, 1.0);
+  // Shop grime: oily residue settles in crevices of metal parts (never on chrome).
+  float grime = smoothstep(0.3, 0.85, vCav) * (0.6 + 0.4 * engineHeight) * (engineZones.x + engineZones.y + engineZones.w) * uDetail;
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.045, 0.038, 0.028), grime * 0.45);
+  roughnessFactor = mix(roughnessFactor, 0.8, grime * 0.5);
+  metalnessFactor = mix(metalnessFactor, 0.3, grime * 0.4);
   if (uMode == 2) roughnessFactor *= 0.55; // Raking inspection light wants tight lobes.
 }`;
 
@@ -166,6 +184,14 @@ const LOBES = /* glsl */`
 #endif`;
 
 const OUTPUT = /* glsl */`
+if ((uMode == 0 || uMode == 2) && engineFilm > 0.001) {
+  // Thin-film interference: the oxide's optical path grows at grazing angles,
+  // sweeping straw → bronze → purple → blue like heat-tempered steel.
+  float cosT = clamp(abs(dot(normal, normalize(vViewPosition))), 0.0, 1.0);
+  float thickness = 0.55 + engineHeight * 0.5 + vCurv * 0.3;
+  vec3 tint = 0.5 + 0.5 * cos(6.2831853 * (thickness * (1.2 + cosT) * vec3(1.0, 1.18, 1.38)));
+  outgoingLight = mix(outgoingLight, outgoingLight * (0.35 + tint * 1.3), engineFilm * 0.55);
+}
 if (uMode == 1) {
   // CAD inspection: blueprint shading, creases from geometric normal derivatives,
   // station lines every 40 mm (model scale) and curvature-traced fastener edges.
@@ -196,6 +222,8 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
     uFlyAxis: { value: FLYWHEEL.axis.clone() },
     uFlyRadius: { value: FLYWHEEL.radius },
     uAniso: { value: options.clearcoat ? .22 : 0 },
+    uVibe: { value: 0 },
+    uVibeTime: { value: 0 },
   };
   const plasma = createPlasmaMaterial(uniforms);
   const solid = new Map<Mesh, Mesh['material']>();
@@ -215,23 +243,27 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
     });
     material.envMapIntensity = .7;
     material.normalScale.set(surface === 0 ? .28 : .6, surface === 0 ? .28 : .6);
-    material.clearcoat = options.clearcoat ? .10 : 0;
+    // Zone B spec: 0.35 on the machined flexplate; LOBES masks it to that zone only.
+    material.clearcoat = options.clearcoat ? .35 : 0;
     material.clearcoatRoughness = .28;
     material.anisotropy = options.clearcoat ? 1 : 0; // Strength is set per pixel in LOBES.
     material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
       Object.assign(shader.uniforms, uniforms, { uSurface: { value: surface } });
-      shader.vertexShader = shader.vertexShader
-        .replace('#include <common>', `#include <common>\nvarying vec3 vHeatWorld;\n${VERTEX_PARS}`)
-        .replace('#include <begin_vertex>', `#include <begin_vertex>\n${VERTEX_MAIN}`);
-      shader.fragmentShader = shader.fragmentShader
-        .replace('#include <common>', `#include <common>\n${HEAT_PARS}\n${FRAGMENT_PARS}`)
-        .replace('#include <color_fragment>', `#include <color_fragment>\n${ZONES}`)
-        .replace('#include <metalnessmap_fragment>', `#include <metalnessmap_fragment>\n${SURFACE}`)
-        .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>\n${BUMP}`)
-        .replace('#include <lights_physical_fragment>', `#include <lights_physical_fragment>\n${LOBES}`)
-        .replace('#include <opaque_fragment>', `${OUTPUT}\nfloat temperature = hoverHeat();\nvec3 hotSteel = mix(vec3(0.65,0.025,0.008), vec3(1.8,0.5,0.035), temperature);\noutgoingLight = mix(outgoingLight, hotSteel, temperature * 0.92);\n#include <opaque_fragment>`);
+      let vertex = inject(shader.vertexShader, '#include <common>', `varying vec3 vHeatWorld;\n${VERTEX_PARS}`);
+      vertex = inject(vertex, '#include <begin_vertex>', VERTEX_MAIN);
+      let fragment = inject(shader.fragmentShader, '#include <common>', `${HEAT_PARS}\n${FRAGMENT_PARS}`);
+      fragment = inject(fragment, '#include <color_fragment>', ZONES);
+      fragment = inject(fragment, '#include <metalnessmap_fragment>', SURFACE);
+      fragment = inject(fragment, '#include <normal_fragment_maps>', BUMP);
+      fragment = inject(fragment, '#include <lights_physical_fragment>', LOBES);
+      fragment = inject(fragment, '#include <opaque_fragment>', `${OUTPUT}
+float temperature = hoverHeat();
+vec3 hotSteel = mix(vec3(0.65,0.025,0.008), vec3(1.8,0.5,0.035), temperature);
+outgoingLight = mix(outgoingLight, hotSteel, temperature * 0.92);
+outgoingLight += ${SHOCK_COLOR};`, 'before');
+      shader.vertexShader = vertex; shader.fragmentShader = fragment;
     };
-    material.customProgramCacheKey = () => `md-engine-thermal-v4-${surface}-${options.clearcoat ? 'hq' : 'lite'}`;
+    material.customProgramCacheKey = () => `md-engine-thermal-v5-${surface}-${options.clearcoat ? 'hq' : 'lite'}`;
     material.needsUpdate = true;
     materials.set(original, material);
     return material;

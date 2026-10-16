@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react';
 
 /** Mutable per-frame input shared by scroll handlers and canvases (never React state). */
-export const motion = { scroll: 0, velocity: 0, tour: 0, split: 0, pointerX: 0, pointerY: 0, reduced: false, mobile: false, coarse: false, gyroAllowed: false };
+export const motion = {
+  scroll: 0, velocity: 0, tour: 0, split: 0, pointerX: 0, pointerY: 0, reduced: false, mobile: false, coarse: false, gyroAllowed: false,
+  /** Last mouse position in CSS pixels (mouse only; touch never drives the ripple). */
+  clientX: -1e4, clientY: -1e4,
+  /** True while the badge canvas sits in the navbar slot. */
+  docked: false,
+};
 
 export function useMotionPreference() {
   const [reduced, setReduced] = useState(() => matchMedia('(prefers-reduced-motion: reduce)').matches);

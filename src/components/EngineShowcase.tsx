@@ -7,7 +7,8 @@ import { useLanguage } from '../i18n';
 import type { ServiceKey } from '../copy.ts';
 import { engineHud } from '../lib/engineHud.ts';
 import { INSPECTION_MODES, type InspectionMode } from '../lib/inspection.ts';
-import { splitAt } from '../lib/splitTimeline.ts';
+import { SPLIT_CLOSE, SPLIT_OPEN, splitAt } from '../lib/splitTimeline.ts';
+import { engineAudio } from '../lib/engineAudio.ts';
 import LoadingGauge from './LoadingGauge';
 import Words from './Words';
 import AssetBoundary from './AssetBoundary';
@@ -29,7 +30,7 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
   const [near, setNear] = useState(false);
   const [mode, setMode] = useState<InspectionMode>('studio');
   const [inspect, setInspect] = useState(false);
-  const [split, setSplit] = useState(false), [xray, setXray] = useState(false), [heat, setHeat] = useState(false);
+  const [split, setSplit] = useState(false), [xray, setXray] = useState(false), [heat, setHeat] = useState(false), [sound, setSound] = useState(false);
   const chapter = tour.chapters[active];
   const side = active % 2 ? 'right' : 'left';
 
@@ -93,7 +94,8 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
         onRefresh: self => { playhead.value = self.progress; playhead.split = splitAt(self.progress); paint(); },
       },
     }).to(playhead, { value: 1, duration: 1, ease: 'none' }, 0)
-      .to(playhead, { split: 1, duration: .5, ease: 'power2.inOut' }, .25);
+      .to(playhead, { split: 1, duration: SPLIT_OPEN[1] - SPLIT_OPEN[0], ease: 'power2.inOut' }, SPLIT_OPEN[0])
+      .to(playhead, { split: 0, duration: SPLIT_CLOSE[1] - SPLIT_CLOSE[0], ease: 'power3.in' }, SPLIT_CLOSE[0]);
     return () => { tween.scrollTrigger?.kill(); tween.kill(); };
   }, [reduced]);
 
@@ -107,6 +109,18 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
   }, [active, side, reduced]);
 
   useEffect(() => { if (!near) setInspect(false); }, [near]);
+
+  // Opt-in audio only plays while the tour is on screen and the tab is in front.
+  useEffect(() => {
+    let inView = false;
+    const sync = () => engineAudio.setActive(inView && !document.hidden);
+    const observer = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; sync(); });
+    if (section.current) observer.observe(section.current);
+    document.addEventListener('visibilitychange', sync);
+    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', sync); engineAudio.setActive(false); };
+  }, []);
+  // Called from the click itself: browsers only start an AudioContext on a gesture.
+  const toggleSound = () => { const next = !sound; engineAudio.setEnabled(next); setSound(next); };
 
   const go = (index: number) => {
     const root = section.current;
@@ -156,8 +170,9 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
           <button aria-pressed={split} disabled={reduced} title={reduced ? tour.effectsStill : undefined} onClick={() => setSplit(value=>!value)}>{tour.split}</button>
           <button aria-pressed={xray} onClick={() => setXray(value=>!value)}>{tour.xray}</button>
           <button aria-pressed={heat} disabled={reduced} title={reduced ? tour.effectsStill : undefined} onClick={() => setHeat(value=>!value)}>{tour.heat}</button>
+          <button aria-pressed={sound} onClick={toggleSound}>{tour.sound}</button>
         </div>
-        {(split || xray || heat) && <p className="engine-effect-note mono" role="status">{reduced ? tour.effectsStill : heat ? tour.heatHint : tour.effectsNote}</p>}
+        {(split || xray || heat || sound) && <p className="engine-effect-note mono" role="status">{reduced && (split || xray || heat) ? tour.effectsStill : heat ? tour.heatHint : sound && !split && !xray ? tour.soundNote : tour.effectsNote}</p>}
       </div>
 
       <svg className="engine-leader" aria-hidden="true"><path ref={leader} /></svg>

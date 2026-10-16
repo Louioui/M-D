@@ -1,10 +1,11 @@
 // Streams GLBs with byte-level progress, decodes Draco in a bounded worker pool,
-// and runs engine analysis in engineDetailWorker before any canvas mounts.
+// and runs engine analysis in engineDetailWorker before the engine canvas mounts
+// (badge analysis runs afterwards, without blocking the hero).
 import { BufferAttribute, DataTexture, LinearFilter, LinearMipmapLinearFilter, Mesh, NoColorSpace, RGBAFormat, RepeatWrapping, type BufferGeometry, type Object3D } from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { deviceProfile } from './deviceTier.ts';
-import type { DetailMessage, DetailRequest } from '../workers/engineDetailWorker.ts';
+import type { DetailMessage, DetailRequest, DetailStage, MeshInput } from '../workers/engineDetailWorker.ts';
 import { publish } from './loadProgress.ts';
 import { createAsyncResourceCache } from './asyncResource.ts';
 import { webgl2Available } from './graphics.ts';
@@ -107,35 +108,60 @@ function makeDetailTexture(pixels: Uint8Array, size: number) {
   return texture;
 }
 
-function runDetailWorker(geometry: BufferGeometry, detailSize: number) {
-  return new Promise<Extract<DetailMessage, { type: 'done' }>>((resolve, reject) => {
-    const position = geometry.getAttribute('position'), normal = geometry.getAttribute('normal');
-    const uv = geometry.getAttribute('uv'), index = geometry.getIndex();
-    if (!index || !(position.array instanceof Float32Array) || !(normal.array instanceof Float32Array)) {
-      reject(new Error('Engine geometry must be indexed Float32 data.')); return;
-    }
-    const indices = index.array instanceof Uint32Array || index.array instanceof Uint16Array ? index.array.slice() : Uint32Array.from(index.array);
-    const request: DetailRequest = {
-      positions: position.array.slice(), normals: normal.array.slice(),
-      uvs: uv && uv.array instanceof Float32Array ? uv.array.slice() : null,
-      index: indices, detailSize,
-    };
-    const worker = new Worker(new URL('../workers/engineDetailWorker.ts', import.meta.url), { type: 'module', name: 'md-engine-detail' });
+type DetailResult = Extract<DetailMessage, { type: 'done' }>;
+
+function workerInput(geometry: BufferGeometry, withTangents: boolean): MeshInput {
+  const position = geometry.getAttribute('position'), normal = geometry.getAttribute('normal');
+  const uv = geometry.getAttribute('uv'), index = geometry.getIndex();
+  if (!index || !(position.array instanceof Float32Array) || !normal || !(normal.array instanceof Float32Array)) {
+    throw new Error('Detail analysis needs indexed Float32 geometry.');
+  }
+  return {
+    positions: position.array.slice(), normals: normal.array.slice(),
+    uvs: withTangents && uv && uv.array instanceof Float32Array ? uv.array.slice() : null,
+    index: index.array instanceof Uint32Array || index.array instanceof Uint16Array ? index.array.slice() : Uint32Array.from(index.array),
+  };
+}
+
+function runDetailWorker(meshes: MeshInput[], detailSize: number, onProgress?: (stage: DetailStage, value: number) => void) {
+  return new Promise<DetailResult>((resolve, reject) => {
+    const request: DetailRequest = { meshes, detailSize };
+    const worker = new Worker(new URL('../workers/engineDetailWorker.ts', import.meta.url), { type: 'module', name: 'md-surface-detail' });
     worker.onmessage = ({ data }: MessageEvent<DetailMessage>) => {
-      if (data.type === 'progress') {
-        const weights = { curvature: [0, .45], tangents: [.45, .1], maps: [.55, .45] } as const;
-        const [start, span] = weights[data.stage];
-        publish({ stage: data.stage, engineDetail: start + span * data.value });
-        return;
-      }
+      if (data.type === 'progress') { onProgress?.(data.stage, data.value); return; }
       worker.terminate();
       if (data.type === 'done') resolve(data); else reject(new Error(data.message));
     };
-    worker.onerror = event => { worker.terminate(); reject(new Error(event.message || 'Engine detail worker failed.')); };
-    const transfer: Transferable[] = [request.positions.buffer, request.normals.buffer, request.index.buffer];
-    if (request.uvs) transfer.push(request.uvs.buffer);
+    worker.onerror = event => { worker.terminate(); reject(new Error(event.message || 'Surface detail worker failed.')); };
+    const transfer: Transferable[] = [];
+    for (const mesh of meshes) {
+      transfer.push(mesh.positions.buffer, mesh.normals.buffer, mesh.index.buffer);
+      if (mesh.uvs) transfer.push(mesh.uvs.buffer);
+    }
     worker.postMessage(request, transfer);
   });
+}
+
+// ---------- Badge analysis ----------
+/**
+ * Curvature/cavity for every badge part plus the forged-steel atlas. Runs after
+ * the badge is already on screen: BadgeModel renders with neutral attributes
+ * and upgrades in place when this lands, so the hero never waits on it.
+ * Resolves null on failure (the badge simply keeps its neutral surface data).
+ */
+let badgeDetail: Promise<DataTexture | null> | null = null;
+export function loadBadgeDetail() {
+  return badgeDetail ??= loadBadge().then(async gltf => {
+    const geometries: BufferGeometry[] = [];
+    gltf.scene.traverse(object => { if (object instanceof Mesh && !geometries.includes(object.geometry)) geometries.push(object.geometry); });
+    const result = await runDetailWorker(geometries.map(geometry => workerInput(geometry, false)), deviceProfile().tier === 'desktop' ? 1024 : 512);
+    geometries.forEach((geometry, i) => {
+      geometry.setAttribute('aCurvature', new BufferAttribute(result.meshes[i].curvature, 1));
+      geometry.setAttribute('aCavity', new BufferAttribute(result.meshes[i].cavity, 1));
+    });
+    console.info(`[md] badge detail ready: ${geometries.length} parts, ${result.detailSize}px forged-steel atlas, worker ${Math.round(result.milliseconds)} ms`);
+    return makeDetailTexture(result.detail, result.detailSize);
+  }).catch(error => { console.error('[md] badge detail analysis failed; keeping neutral surface data.', error); return null; });
 }
 
 let engineAssets: Promise<EngineAssets> | null = null;
@@ -162,12 +188,17 @@ export function loadEngineAssets() {
       object.geometry.setAttribute('aCavity', object.geometry.getAttribute('_cavity') ?? new BufferAttribute(new Float32Array(n), 1));
     });
     try {
-      const result = await runDetailWorker(geometry, profile.detailSize);
+      const weights = { curvature: [0, .45], tangents: [.45, .1], maps: [.55, .45] } as const;
+      const result = await runDetailWorker([workerInput(geometry, true)], profile.detailSize, (stage, value) => {
+        const [start, span] = weights[stage];
+        publish({ stage, engineDetail: start + span * value });
+      });
+      const { tangents, curvature, cavity } = result.meshes[0];
       console.info(`[md] ${profile.tier} engine ready: download ${Math.round(downloaded - started)} ms, Draco decode ${Math.round(decoded - downloaded)} ms, ` +
         `worker analysis ${Math.round(result.milliseconds)} ms (${count.toLocaleString()} vertices, ${result.detailSize}px atlas), total ${Math.round(performance.now() - started)} ms`);
-      if (result.tangents) geometry.setAttribute('tangent', new BufferAttribute(result.tangents, 4));
-      geometry.setAttribute('aCurvature', new BufferAttribute(result.curvature, 1));
-      geometry.setAttribute('aCavity', new BufferAttribute(result.cavity, 1));
+      if (tangents) geometry.setAttribute('tangent', new BufferAttribute(tangents, 4));
+      geometry.setAttribute('aCurvature', new BufferAttribute(curvature, 1));
+      geometry.setAttribute('aCavity', new BufferAttribute(cavity, 1));
       publish({ engineDetail: 1, stage: 'ready' });
       return { gltf, mesh, detailMap: makeDetailTexture(result.detail, result.detailSize), analyzed: true, milliseconds: result.milliseconds };
     } catch (error) {
@@ -191,5 +222,7 @@ export function prefetchAssets() {
   const idle = (callback: () => void) => typeof window.requestIdleCallback === 'function'
     ? window.requestIdleCallback(callback, { timeout: 2500 })
     : window.setTimeout(callback, 600);
-  loadBadge().catch(() => undefined).finally(() => idle(() => { loadEngineAssets().catch(() => undefined); }));
+  loadBadge().catch(() => undefined).finally(() => idle(() => {
+    loadBadgeDetail().finally(() => idle(() => { loadEngineAssets().catch(() => undefined); }));
+  }));
 }

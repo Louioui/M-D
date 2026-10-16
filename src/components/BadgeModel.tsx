@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer } from '@react-three/drei';
 import type { Group } from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -9,6 +9,9 @@ import { badgeChannel } from '../lib/motionClient.ts';
 import { useGraphicsRecovery, useSceneActivity } from './sceneHooks';
 import { createLiquidState, prepareLiquidBadge, stepLiquid } from '../lib/liquidBadge.ts';
 import { deviceProfile } from '../lib/deviceTier.ts';
+import { loadBadgeDetail } from '../lib/assetLoader.ts';
+
+const debugZones = new URLSearchParams(location.search).has('zones');
 
 /** The forged badge: lettering, plate and wrenches stay upright; only GearAssembly turns. */
 export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boolean }) {
@@ -25,12 +28,38 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
   const tilt = useRef<Group>(null);
   const { visible, invalidate } = useSceneActivity(reduced);
   const recovery = useGraphicsRecovery();
+  const gl = useThree(state => state.gl);
+  // Forged-steel atlas + curvature/cavity land after first paint; upgrade in place.
+  useEffect(() => {
+    let alive = true;
+    finish.setZones(debugZones);
+    loadBadgeDetail().then(texture => { if (alive) { finish.setDetail(texture); invalidate(); } });
+    return () => { alive = false; };
+  }, [finish, invalidate]);
+  // Canvas rect for the cursor ripple: re-measured lazily after scroll/resize/dock
+  // flips, never on every frame.
+  const rect = useRef({ left: 0, bottom: 0, dirty: true });
+  useEffect(() => {
+    const dirty = () => { rect.current.dirty = true; };
+    const observer = new ResizeObserver(dirty); observer.observe(gl.domElement);
+    window.addEventListener('scroll', dirty, { passive: true });
+    window.addEventListener('resize', dirty, { passive: true });
+    return () => { observer.disconnect(); window.removeEventListener('scroll', dirty); window.removeEventListener('resize', dirty); };
+  }, [gl]);
 
   useFrame((_, frameDelta) => {
     if (!tilt.current || !visible.current || document.hidden) return;
     const delta = Math.min(frameDelta, .1); // No large jump after tab suspension.
     const energy = stepLiquid(liquid.current,motion.pointerX,motion.pointerY,motion.velocity,delta,reduced);
     finish.update(energy,liquid.current.phase,motion.pointerX,motion.pointerY,reduced);
+    // Ripples only in the hero (not while docked in the navbar) and only while moving.
+    const rippling = !reduced && !motion.docked && !motion.coarse && energy > .002;
+    if (rippling) {
+      const box = rect.current;
+      if (box.dirty) { const r = gl.domElement.getBoundingClientRect(); box.left = r.left; box.bottom = r.bottom; box.dirty = false; }
+      const dpr = gl.getPixelRatio();
+      finish.ripple((motion.clientX - box.left) * dpr, (box.bottom - motion.clientY) * dpr, 150 * dpr, Math.min(1, energy * 2.2));
+    } else finish.ripple(-1e4, -1e4, 150, 0);
     motion.velocity *= Math.exp(-delta * 6);
     const input = badgeChannel.input;
     input[BADGE_IN.velocity] = motion.velocity;

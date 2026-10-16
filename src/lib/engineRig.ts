@@ -17,9 +17,16 @@ export function createEngineRig(model: Object3D) {
     parts.push({ mesh: object, rest: object.position.clone(), travel, corners, internal: Boolean(object.userData.mdInternal) });
   });
   const framing = new Float32Array(parts.length * 8 * 3);
+  // Telemetry beams: rest centre → current centre for every part that travels
+  // (model space, drawn inside the scaled engine group). `beamEnds` tags each
+  // vertex 0 (anchor) or 1 (moving part) so a shader can send pulses outward.
+  const movers = parts.filter(part => part.travel.lengthSq() > 0);
+  const centres = movers.map(part => part.corners.reduce((sum, point) => sum.add(point), new Vector3()).multiplyScalar(1 / 8));
+  const beams = new Float32Array(movers.length * 6), beamEnds = new Float32Array(movers.length * 2);
+  for (let i = 0; i < movers.length; i++) { centres[i].toArray(beams, i * 6); centres[i].toArray(beams, i * 6 + 3); beamEnds[i * 2 + 1] = 1; }
   let amount = 0, compact = false;
   return {
-    parts, framing,
+    parts, framing, beams, beamEnds,
     apply(value: number, mobile: boolean, xray: boolean) {
       amount = Math.max(0, Math.min(1, value)); compact = mobile;
       for (const part of parts) {
@@ -27,6 +34,7 @@ export function createEngineRig(model: Object3D) {
         part.mesh.visible = !part.internal || xray || amount > .08;
       }
       model.updateMatrixWorld(true);
+      for (let i = 0; i < movers.length; i++) corner.copy(centres[i]).addScaledVector(movers[i].travel, amount * (mobile ? .55 : 1)).toArray(beams, i * 6 + 3);
       let offset = 0;
       for (const part of parts) for (const point of part.corners) {
         corner.copy(point).addScaledVector(part.travel, amount * (mobile ? .55 : 1)).multiplyScalar(ENGINE_SCALE).toArray(framing, offset);

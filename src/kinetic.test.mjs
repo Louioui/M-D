@@ -1,18 +1,67 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BoxGeometry, DataTexture, Group, Mesh, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from 'three';
+import { BoxGeometry, BufferAttribute, DataTexture, Group, Mesh, MeshStandardMaterial, PerspectiveCamera, Quaternion, Vector3 } from 'three';
 import { frameAssembly } from './lib/frameAssembly.ts';
 import { createEngineRig } from './lib/engineRig.ts';
 import { splitAt } from './lib/splitTimeline.ts';
 import { prepareEngineMaterials } from './lib/engineMaterials.ts';
 import { createLiquidState, prepareLiquidBadge, stepLiquid } from './lib/liquidBadge.ts';
+import { createShockTrigger, SHOCK_SECONDS, shockAt, shouldShock } from './lib/shockwave.ts';
+import { inject } from './lib/shaderInject.ts';
+import { FIRING_HZ, rmsLevel } from './lib/engineAudio.ts';
 import { createEngineState, ENGINE_IN, ENGINE_OUT, setFraming, solveEngine } from './lib/cameraSolver.ts';
 
-test('split timeline only opens between 25% and 75%, with reversible eased endpoints',()=>{
-  assert.equal(splitAt(-1),0);assert.equal(splitAt(.25),0);assert.equal(splitAt(.5),.5);assert.equal(splitAt(.75),1);assert.equal(splitAt(2),1);
+test('split timeline opens over 25–75%, holds, then snaps back together over 90–100%',()=>{
+  assert.equal(splitAt(-1),0);assert.equal(splitAt(.25),0);assert.equal(splitAt(.5),.5);assert.equal(splitAt(.75),1);
+  assert.equal(splitAt(.85),1);assert.equal(splitAt(.9),1);assert.equal(splitAt(1),0);assert.equal(splitAt(2),0);
   let last=0;
-  for(let i=0;i<=100;i++){const v=splitAt(i/100);assert.ok(v>=last && v<=1);last=v;}
+  for(let i=0;i<=90;i++){const v=splitAt(i/100);assert.ok(v>=last && v<=1);last=v;}
+  for(let i=90;i<=100;i++){const v=splitAt(i/100);assert.ok(v<=last && v>=0);last=v;}
   assert.ok(splitAt(.251)<.000001);assert.ok(1-splitAt(.749)<.000001);
+  assert.ok(splitAt(.95)>.8,'power3.in: the assembly lifts off slowly and lands hard');
+});
+
+test('shockwave fires once per deep explosion, with hysteresis, and its front fades to idle',()=>{
+  const trigger=createShockTrigger();
+  assert.equal(shouldShock(trigger,.3,.4),false,'a shallow split never arms');
+  assert.equal(shouldShock(trigger,0,.4),false);
+  let fired=0;
+  for(const amount of [.2,.7,1,.6,.3,.05,.01,0,.01,0,.015]) if(shouldShock(trigger,amount,.95)) fired++;
+  assert.equal(fired,1,'jitter around the landing threshold must not re-fire');
+  for(const amount of [.8,0]) if(shouldShock(trigger,amount,.95)) fired++;
+  assert.equal(fired,2,'a new explosion re-arms it');
+  for(const [amount,progress] of [[1,.6],[.4,.4],[0,.3]]) assert.equal(shouldShock(trigger,amount,progress),false,'scrolling back up rebuilds silently');
+  for(const [amount,progress] of [[.9,.8],[0,.8]]) assert.equal(shouldShock(trigger,amount,progress),false,'switching SPLIT PARTS off mid-tour lands silently');
+  assert.equal(trigger.armed,false,'a silent landing disarms, so it cannot fire later on its own');
+  assert.equal(shouldShock(trigger,0,.99),false);
+  assert.deepEqual(shockAt(-1),{radius:0,strength:0});
+  assert.equal(shockAt(0).strength,1);
+  assert.ok(shockAt(.3).radius>shockAt(.1).radius && shockAt(.3).strength<shockAt(.1).strength);
+  assert.equal(shockAt(SHOCK_SECONDS).strength,0,'the demand loop can go idle once the wave has passed');
+});
+
+test('telemetry beams run from each moving part\'s rest centre to its exploded centre',()=>{
+  const rig=createEngineRig(fixture());
+  assert.equal(rig.beams.length,3*6);assert.deepEqual([...rig.beamEnds],[0,1,0,1,0,1]);
+  rig.apply(0,false,false);
+  for(let i=0;i<rig.beams.length;i+=6) for(let k=0;k<3;k++) assert.ok(Math.abs(rig.beams[i+k]-rig.beams[i+3+k])<1e-9);
+  rig.apply(1,false,false);
+  assert.ok(Math.abs(rig.beams[4]-rig.beams[1]-1.02)<1e-6,'cover beam spans its full lift');
+  rig.apply(1,true,false);
+  assert.ok(Math.abs(rig.beams[4]-rig.beams[1]-1.02*.55)<1e-6,'phones use the reduced travel');
+});
+
+test('shader injection fails loudly when a three.js chunk anchor is missing',()=>{
+  assert.equal(inject('a\n#include <x>\nb','#include <x>','y'),'a\n#include <x>\ny\nb');
+  assert.equal(inject('#include <x>','#include <x>','y','before'),'y\n#include <x>');
+  assert.throws(()=>inject('void main(){}','#include <missing>','y'),/anchor not found/);
+});
+
+test('engine audio level is a bounded RMS and silent input reads zero',()=>{
+  assert.equal(rmsLevel(new Float32Array(64)),0);
+  assert.ok(Math.abs(rmsLevel(new Float32Array(64).fill(.1),1)-.1)<1e-6);
+  assert.equal(rmsLevel(new Float32Array(64).fill(1)),1);
+  assert.ok(FIRING_HZ>20 && FIRING_HZ<30,'four-cylinder idle fires ~25 times a second');
 });
 
 function fixture(){
@@ -67,6 +116,8 @@ test('X-ray swaps only instance materials, shares world-space heat, and restores
   prepared.setXray(false);assert.equal(prepared.model.children[0].material,physical);assert.equal(source.children[0].material,original);
   let originalDisposed=false;original.addEventListener('dispose',()=>originalDisposed=true);
   prepared.dispose();assert.equal(originalDisposed,false);
+  assert.equal(prepared.materials[0].clearcoat,.35,'flexplate clearcoat per spec (masked to that zone in the shader)');
+  assert.ok(prepared.plasma.uniforms.uShock===prepared.uniforms.uShock,'the shockwave reaches the X-ray shell too');
 });
 
 test('render-frame safety fit prevents clipping while a worker still has the previous pose',()=>{
@@ -91,5 +142,13 @@ test('liquid badge reacts to velocity, settles, respects reduced motion and owns
   assert.ok('PHYSICAL' in finish.materials[0].defines,'Physical specular/IOR shader features survive the Standard material copy');
   finish.update(.8,1,.5,.3,false);assert.equal(finish.uniforms.uLiquid.value,.8);assert.ok(finish.materials[0].anisotropy>.12);
   finish.update(0,0,.5,.3,true);assert.equal(finish.materials[0].envMapRotation.y,0);
+  const geometry=source.children[0].geometry,count=geometry.getAttribute('position').count;
+  assert.equal(geometry.getAttribute('aCurvature').count,count,'neutral curvature until the worker lands');
+  assert.equal(finish.uniforms.uDetail.value,0);
+  const atlas=new DataTexture();finish.setDetail(atlas);assert.equal(finish.uniforms.uDetailMap.value,atlas);assert.equal(finish.uniforms.uDetail.value,1);
+  finish.setDetail(null);assert.equal(finish.uniforms.uDetail.value,0);
+  finish.ripple(10,20,150,.5);assert.equal(finish.uniforms.uRippleStrength.value,.5);
+  const supplied=new Float32Array(count).fill(.7);geometry.setAttribute('aCurvature',new BufferAttribute(supplied,1));
+  prepareLiquidBadge(source,false).dispose();assert.equal(geometry.getAttribute('aCurvature').array,supplied,'worker data on shared geometry is never overwritten');
   finish.dispose();
 });

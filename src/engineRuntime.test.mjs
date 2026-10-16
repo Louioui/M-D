@@ -150,7 +150,7 @@ test('procedural detail atlas tiles seamlessly in every channel', () => {
   const size = 64, pixels = generateDetailAtlas(size);
   assert.equal(pixels.length, size * size * 4);
   const at = (x, y, c) => pixels[((y % size) * size + (x % size)) * 4 + c];
-  for (let c = 0; c < 3; c++) {
+  for (let c = 0; c < 4; c++) {
     let edge = 0, interior = 0;
     for (let i = 0; i < size; i++) {
       edge += Math.abs(at(size - 1, i, c) - at(0, i, c)) + Math.abs(at(i, size - 1, c) - at(i, 0, c));
@@ -160,4 +160,6 @@ test('procedural detail atlas tiles seamlessly in every channel', () => {
   }
   let variance = 0; for (let i = 0; i < pixels.length; i += 4) variance += Math.abs(pixels[i] - 128);
   assert.ok(variance / (size * size) > 8, 'sand-cast channel is not flat');
+  let scratched = 0; for (let i = 3; i < pixels.length; i += 4) if (Math.abs(pixels[i] - 128) > 20) scratched++;
+  assert.ok(scratched > size * size * .01 && scratched < size * size * .6, 'forged-steel alpha carries scratches and pits over a polished plane');
 });

@@ -178,15 +178,51 @@ function sample(l: Lattice, u: number, v: number) {
 }
 
 /**
+ * Deep-stamped forged steel: 0.5 is the polished plane, lower values are
+ * fatigue pits and tool gouges, higher values are burnished scratch lips.
+ * Scratches are rasterized with wrapped pixel indices, so the field tiles.
+ */
+function forgedSteel(size: number, unit: number) {
+  const field = new Float32Array(size * size);
+  const grain = lattice(Math.round(160 * unit), Math.round(160 * unit), 51), pits = lattice(Math.round(96 * unit), Math.round(96 * unit), 52);
+  for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+    const u = x / size, v = y / size, pit = Math.max(0, (sample(pits, u, v) - .84) / .16);
+    field[y * size + x] = .5 + (sample(grain, u, v) - .5) * .08 - pit * pit * .38;
+  }
+  // Scratches: short, mostly-parallel strokes (tool marks) plus random scuffs.
+  const random = lattice(4096, 1, 53).values;
+  const strokes = Math.round(700 * unit * unit);
+  for (let s = 0; s < strokes; s++) {
+    const r = (k: number) => random[(s * 6 + k) % random.length];
+    const tool = r(0) < .6;
+    const angle = tool ? .35 + (r(1) - .5) * .25 : r(1) * Math.PI;
+    const length = (tool ? 18 + r(2) * 60 : 6 + r(2) * 26) * unit, depth = .1 + r(3) * .22;
+    const dx = Math.cos(angle), dy = Math.sin(angle), x0 = r(4) * size, y0 = r(5) * size;
+    for (let t = 0; t < length; t++) {
+      const fade = Math.sin(Math.PI * t / length);
+      const px = Math.round(x0 + dx * t), py = Math.round(y0 + dy * t);
+      const at = (ox: number, oy: number) => ((((py + oy) % size) + size) % size) * size + ((((px + ox) % size) + size) % size);
+      field[at(0, 0)] -= depth * fade;
+      // Displaced metal piles up as a bright lip beside the groove.
+      const lip = at(Math.round(-dy), Math.round(dx));
+      field[lip] += depth * fade * .45;
+    }
+  }
+  return field;
+}
+
+/**
  * RGBA8 atlas, one height field per channel:
  *  R — sand-cast aluminum: foundry fBm with sparse shrinkage pores.
  *  G — CNC brushed steel: long anisotropic streaks (sampled radially on the flywheel).
  *  B — glass-filled polymer: jittered-cell stipple like molded composite.
- * A is reserved (255). Feature sizes scale with the atlas so tiers look alike.
+ *  A — deep-stamped forged steel: scratches, tool marks and fatigue pitting (badge).
+ * Feature sizes scale with the atlas so tiers look alike.
  */
 export function generateDetailAtlas(size: number, onProgress?: (fraction: number) => void) {
   const pixels = new Uint8Array(size * size * 4);
   const unit = size / 512;
+  const forged = forgedSteel(size, unit);
   const sand = [lattice(Math.round(24 * unit), Math.round(24 * unit), 11), lattice(Math.round(48 * unit), Math.round(48 * unit), 12),
     lattice(Math.round(96 * unit), Math.round(96 * unit), 13), lattice(Math.round(192 * unit), Math.round(192 * unit), 14)];
   const pores = lattice(Math.round(128 * unit), Math.round(128 * unit), 21);
@@ -212,7 +248,7 @@ export function generateDetailAtlas(size: number, onProgress?: (fraction: number
       pixels[o] = Math.max(0, Math.min(255, r * 255));
       pixels[o + 1] = Math.max(0, Math.min(255, g * 255));
       pixels[o + 2] = Math.max(0, Math.min(255, b * b * (3 - 2 * b) * 255));
-      pixels[o + 3] = 255;
+      pixels[o + 3] = Math.max(0, Math.min(255, forged[y * size + x] * 255));
     }
     if (onProgress && (y & 63) === 0) onProgress(y / size);
   }

@@ -28,8 +28,8 @@ const en = {
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   },
   hero: {
-    kicker: 'M&D AUTO MECHANIC SERVICE · EST. BY DAVID & EDITH',
-    title: ['Boyle Heights’', 'Hardest-Working', 'Auto Shop'],
+    kicker: 'BOYLE HEIGHTS’ HARDEST-WORKING AUTO SHOP',
+    title: ['HARD WORK.', 'HONEST REPAIRS.'],
     intro: ['FAMILY-OWNED & OPERATED.', 'ALL MAKES. ALL MODELS.', 'DAVID & EDITH.'],
     cta: 'Let’s get you road-ready',
     scroll: 'SCROLL TO LOOK CLOSER',
@@ -126,8 +126,8 @@ const es: Copy = {
     days: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
   },
   hero: {
-    kicker: 'M&D AUTO MECHANIC SERVICE · DE DAVID Y EDITH',
-    title: ['El taller', 'más trabajador', 'de Boyle Heights'],
+    kicker: 'EL TALLER MÁS TRABAJADOR DE BOYLE HEIGHTS',
+    title: ['TRABAJO DURO.', 'TRATO HONESTO.'],
     intro: ['NEGOCIO FAMILIAR.', 'TODAS LAS MARCAS Y MODELOS.', 'DAVID Y EDITH.'],
     cta: 'Ponga su carro en buenas manos',
     scroll: 'DESLICE PARA VER DE CERCA',

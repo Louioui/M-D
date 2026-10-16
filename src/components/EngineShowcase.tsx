@@ -49,8 +49,11 @@ export default function EngineShowcase({ reduced, onBook }: { reduced: boolean; 
   const measure = useCallback(() => {
     const stage = stageRef.current, canvasBox = visual.current, box = card.current;
     if (!stage || !canvasBox || !box) return;
-    engineHud.canvasX = canvasBox.offsetLeft;
-    engineHud.canvasY = canvasBox.offsetTop;
+    const surface = canvasBox.querySelector<HTMLElement>('.engine-stage-canvas');
+    // The phone toolbar reserves space above the canvas. Projected 3D anchors
+    // must use the canvas origin, not the surrounding visual area's origin.
+    engineHud.canvasX = canvasBox.offsetLeft + (surface?.offsetLeft ?? 0);
+    engineHud.canvasY = canvasBox.offsetTop + (surface?.offsetTop ?? 0);
     const stacked = getComputedStyle(stage).getPropertyValue('--stacked').trim() === '1';
     engineHud.card = stacked ? null : {
       x: box.offsetLeft + (side === 'left' ? box.offsetWidth : 0),

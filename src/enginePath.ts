@@ -21,7 +21,7 @@ const aim = new CatmullRomCurve3(targets.map(p => new Vector3(...p)), false, 'ce
  * cover top, +Z intake runners, upper +X timing/VVT housing, lower +X flexplate.
  */
 export const ENGINE_FOCUS: readonly Vec3Tuple[] = [
-  [.04, .915, .015], [-.25, .08, .68], [.52, .35, -.28], [.655, -.56, .03],
+  [.04, .915, .015], [-.125, .05, .807], [.603, .37, -.28], [.625, -.59, .06],
 ];
 /** Scale applied to the engine object in the scene; anchors and framing follow it. */
 export const ENGINE_SCALE = 1.22;

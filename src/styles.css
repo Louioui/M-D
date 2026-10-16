@@ -10,3 +10,4 @@
 @media(max-width:767px){.hero-title h1 span:last-child{font-size:15.4vw}.hero-logo-slot{width:80vw;top:29%;height:35%}.hero-intro>p{font-size:10px;color:#eee}.hero-location>span{font-size:10px}.hero-location>span span{font-size:9px}}
 .hero-intro>p,.hero-location{filter:drop-shadow(0 2px 5px #000)}
 @media(max-width:380px){.site-header .brand-small{font-size:12px}.header-actions>.button{gap:9px;padding:0 9px}.header-actions{gap:4px}.hero-title h1{font-size:18.8vw}}
+.vault-head{position:sticky;top:0;z-index:2;background:#171717}

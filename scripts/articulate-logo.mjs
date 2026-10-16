@@ -6,7 +6,8 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { draco, prune, weld, dedup, simplify, textureCompress } from '@gltf-transform/functions';
 import draco3d from 'draco3dgltf';
-import { Shape, Path, ExtrudeGeometry, CylinderGeometry, TorusGeometry, Matrix4 } from 'three';
+import { Shape, Path, ExtrudeGeometry, CylinderGeometry, TorusGeometry, BoxGeometry, Matrix4 } from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import fs from 'node:fs/promises';
 import sharp from 'sharp';
 import { MeshoptSimplifier } from 'meshoptimizer';
@@ -43,17 +44,48 @@ function keep(x,y){const px=500+x/2.15*1000,py=500-y/2.15*1000;return Math.hypot
 const retained=[],positionArray=positions.getArray();
 for(let i=0;i<indices.getCount();i+=3){const face=[indices.getScalar(i),indices.getScalar(i+1),indices.getScalar(i+2)];let x=0,y=0;for(const n of face){x+=positionArray[n*3]/3;y+=positionArray[n*3+1]/3;}if(keep(x,y))retained.push(...face);}
 source.setIndices(doc.createAccessor('Stationary indices').setType('SCALAR').setArray(new Uint32Array(retained)).setBuffer(buffer));
-await doc.transform(dedup(),weld(),simplify({simplifier:MeshoptSimplifier,ratio:.1,error:.01,lockBorder:true}),textureCompress({encoder:sharp,targetFormat:'webp',resize:[2048,2048]}));
+// Keep the small letter bevels, wrench jaws and ring opening crisp. The previous
+// 10% reduction rounded away much of this silhouette at close inspection.
+await doc.transform(dedup(),weld(),simplify({simplifier:MeshoptSimplifier,ratio:.22,error:.003,lockBorder:true}),textureCompress({encoder:sharp,targetFormat:'webp',resize:[3072,3072]}));
 root.listNodes()[0].setName('StationaryBadge');root.listMeshes()[0].setName('Original lettering, plate and crossed wrenches');
+const branding = source.getMaterial();
+branding.setName('Original painted lettering and forged tools');
+branding.setRoughnessFactor(.84).setNormalScale(.85);
 const gear = doc.createNode('GearAssembly'); scene.addChild(gear);
 // Deterministic, subtle surface variation gives the new metal a worn brushed finish.
 const side=256,pixels=new Uint8Array(side*side*4);let seed=2020;
 for(let y=0;y<side;y++)for(let x=0;x<side;x++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const grain=((seed>>>24)/255-.5)*22,brush=Math.sin(y*2.1)*3,scratch=(seed%997<6)?-45:0;const i=(y*side+x)*4;pixels[i]=Math.max(0,Math.min(255,193+grain+brush+scratch));pixels[i+1]=Math.max(0,Math.min(255,198+grain+brush+scratch));pixels[i+2]=Math.max(0,Math.min(255,205+grain+brush+scratch));pixels[i+3]=255;}
 const brushed=doc.createTexture('Rebuilt gear steel grain').setMimeType('image/png').setImage(new Uint8Array(await sharp(pixels,{raw:{width:side,height:side,channels:4}}).png().toBuffer()));
-const steel = doc.createMaterial('Brushed forged steel').setBaseColorFactor([.42,.45,.49,1]).setMetallicFactor(.92).setRoughnessFactor(.38).setBaseColorTexture(brushed);
+// Real normal and packed roughness channels: tiny surface grooves respond to
+// lighting instead of painting all the apparent detail into the color texture.
+const normals=new Uint8Array(side*side*3),roughness=new Uint8Array(side*side*3);
+const height=(x,y)=>pixels[(((y+side)%side)*side+(x+side)%side)*4]/255;
+for(let y=0;y<side;y++)for(let x=0;x<side;x++){
+ const i=(y*side+x)*3,dx=(height(x+1,y)-height(x-1,y))*.6,dy=(height(x,y+1)-height(x,y-1))*.6;
+ const length=Math.hypot(dx,dy,1);
+ normals.set([Math.round((-.5*dx/length+.5)*255),Math.round((-.5*dy/length+.5)*255),Math.round((.5/length+.5)*255)],i);
+ roughness.set([255,Math.round(90+(height(x,y)-.75)*65),247],i);
+}
+const microNormal=doc.createTexture('Microscopic brushed steel normal').setMimeType('image/png').setImage(new Uint8Array(await sharp(normals,{raw:{width:side,height:side,channels:3}}).png().toBuffer()));
+const microRoughness=doc.createTexture('Steel roughness and metalness').setMimeType('image/png').setImage(new Uint8Array(await sharp(roughness,{raw:{width:side,height:side,channels:3}}).png().toBuffer()));
+const steel = doc.createMaterial('Brushed forged steel').setBaseColorFactor([.42,.45,.49,1]).setMetallicFactor(.92).setRoughnessFactor(1).setBaseColorTexture(brushed).setNormalTexture(microNormal).setNormalScale(.3).setMetallicRoughnessTexture(microRoughness);
 const dark = doc.createMaterial('Dark steel edge').setBaseColorFactor([.035,.047,.072,1]).setMetallicFactor(.86).setRoughnessFactor(.43);
-const bright = doc.createMaterial('Machined edge and rivets').setBaseColorFactor([.57,.60,.65,1]).setMetallicFactor(.94).setRoughnessFactor(.3);
-function addGeometry(name,g,material,parent=gear){
+const bright = doc.createMaterial('Machined edges and socket hardware').setBaseColorFactor([.57,.60,.65,1]).setMetallicFactor(.94).setRoughnessFactor(.3);
+const satin = doc.createMaterial('Turned steel face').setBaseColorFactor([.29,.33,.38,1]).setMetallicFactor(.96).setRoughnessFactor(.9).setBaseColorTexture(brushed).setNormalTexture(microNormal).setNormalScale(.2).setMetallicRoughnessTexture(microRoughness);
+const recess = doc.createMaterial('Socket recess and engraved marks').setBaseColorFactor([.012,.018,.027,1]).setMetallicFactor(.68).setRoughnessFactor(.48);
+// Static parts of each finish share one mesh, keeping the detailed moving ring
+// to five draw calls instead of creating a draw call for every screw or mark.
+const batches = new Map();
+const parts = [];
+function addGeometry(name,g,material){
+ parts.push(name);
+ return { setTranslation(position) { g.translate(...position); queue(); } };
+ function queue(){
+  if(!g.index){ const count=g.getAttribute('position').count;g.setIndex(Array.from({length:count},(_,i)=>i)); }
+  const batch=batches.get(material)??[];batch.push(g);batches.set(material,batch);
+ }
+}
+function writeGeometry(name,g,material,parent=gear){
  const primitive=doc.createPrimitive().setMaterial(material);
  for(const [threeName,gltfName] of [['position','POSITION'],['normal','NORMAL'],['uv','TEXCOORD_0']]){
   const a=g.getAttribute(threeName);if(!a)continue;
@@ -67,16 +99,44 @@ function gearShape(extra=0){const s=new Shape();const teeth=12;
   const a=(n+phase)*Math.PI*2/teeth+Math.PI/12,x=Math.cos(a)*(r+extra),y=Math.sin(a)*(r+extra);if(n===0&&phase===0)s.moveTo(x,y);else s.lineTo(x,y);
  }s.closePath();const hole=new Path();hole.absarc(0,0,.652,0,Math.PI*2,true);s.holes.push(hole);return s;
 }
-const extrusion={depth:.105,steps:1,bevelEnabled:true,bevelSegments:3,bevelSize:.009,bevelThickness:.009,curveSegments:48};
+const extrusion={depth:.105,steps:1,bevelEnabled:true,bevelSegments:5,bevelSize:.009,bevelThickness:.009,curveSegments:64};
 addGeometry('Gear dark outline',new ExtrudeGeometry(gearShape(.013),extrusion),dark).setTranslation([0,0,-.139]);
 addGeometry('Gear steel teeth',new ExtrudeGeometry(gearShape(),extrusion),steel).setTranslation([0,0,-.12]);
-addGeometry('Machined outer race',new TorusGeometry(.773,.008,6,128),bright).setTranslation([0,0,-.003]);
-addGeometry('Inner steel rim',new TorusGeometry(.669,.011,6,128),dark).setTranslation([0,0,.002]);
+function annulus(outer,inner){const s=new Shape();s.absarc(0,0,outer,0,Math.PI*2,false);const h=new Path();h.absarc(0,0,inner,0,Math.PI*2,true);s.holes.push(h);return s;}
+const face = new ExtrudeGeometry(annulus(.766,.679),{depth:.009,bevelEnabled:true,bevelSize:.002,bevelThickness:.002,bevelSegments:2,curveSegments:96});
+addGeometry('Recessed turned steel annulus',face,satin).setTranslation([0,0,-.01]);
+addGeometry('Raised polished outer lip',new TorusGeometry(.774,.007,8,192),bright).setTranslation([0,0,-.002]);
+addGeometry('Inner steel rim',new TorusGeometry(.669,.009,8,192),dark).setTranslation([0,0,.002]);
+addGeometry('Polished inner race',new TorusGeometry(.682,.003,6,192),bright).setTranslation([0,0,.001]);
+// Fine concentric machining tracks catch the strip lights as the gear turns.
+for(const radius of [.69,.695,.746,.751,.756]){
+ addGeometry('Lathe score '+radius,new TorusGeometry(radius,.00065,4,192),dark).setTranslation([0,0,.0015]);
+}
+function hexShape(radius,hole=0){const s=new Shape();for(let j=0;j<6;j++){const a=j*Math.PI/3;const p=[Math.cos(a)*radius,Math.sin(a)*radius];j?s.lineTo(...p):s.moveTo(...p);}s.closePath();if(hole){const h=new Path();for(let j=5;j>=0;j--){const a=j*Math.PI/3;const p=[Math.cos(a)*hole,Math.sin(a)*hole];j===5?h.moveTo(...p):h.lineTo(...p);}h.closePath();s.holes.push(h);}return s;}
 for(let n=0;n<12;n++){
  const a=n*Math.PI*2/12+Math.PI/12;
- const bolt=new CylinderGeometry(.017,.017,.011,6,1);bolt.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
- addGeometry(`Gear rivet ${n+1}`,bolt,bright).setTranslation([Math.cos(a)*.727,Math.sin(a)*.727,.001]);
+ const x=Math.cos(a)*.721,y=Math.sin(a)*.721;
+ addGeometry(`Washer ${n+1}`,new TorusGeometry(.021,.0035,6,24),bright).setTranslation([x,y,.003]);
+ const bolt=new ExtrudeGeometry(hexShape(.016,.007),{depth:.009,bevelEnabled:true,bevelSize:.0013,bevelThickness:.001,bevelSegments:2});
+ addGeometry(`Recessed hex socket ${n+1}`,bolt,bright).setTranslation([x,y,.003]);
+ const socket=new CylinderGeometry(.007,.007,.001,6);socket.applyMatrix4(new Matrix4().makeRotationX(Math.PI/2));
+ addGeometry(`Socket floor ${n+1}`,socket,recess).setTranslation([x,y,.002]);
+ // A short, recessed stripe follows each tooth; the bevel remains uninterrupted.
+ const mark=new BoxGeometry(.002,.022,.0008);mark.rotateZ(a-Math.PI/2);
+ addGeometry(`Tooth machining mark ${n+1}`,mark,dark).setTranslation([Math.cos(a)*.822,Math.sin(a)*.822,-.004]);
+ for(let j=0;j<3;j++){
+  const angle=a+(j-1)*.055;
+  const tick=new BoxGeometry(.0014,j===1?.012:.006,.0007);tick.rotateZ(angle-Math.PI/2);
+  addGeometry(`Engraved index ${n+1}.${j+1}`,tick,recess).setTranslation([Math.cos(angle)*.758,Math.sin(angle)*.758,.0018]);
+ }
 }
+for(const [material,geometries] of batches){
+ const merged=mergeGeometries(geometries,false);
+ if(!merged)throw new Error('Failed to batch gear finish '+material.getName());
+ writeGeometry(material.getName(),merged,material);
+ geometries.forEach(g=>g.dispose());
+}
+gear.setExtras({finish:'Machined forged steel',detailParts:parts.length,socketBolts:12,independentBranding:true});
 // An authored idle clip also makes the articulated asset usable outside this site.
 const times=new Float32Array([0,15,30,45,60]);const rotations=new Float32Array(20);
 for(let i=0;i<5;i++){const a=i*Math.PI/2;rotations.set([0,0,Math.sin(a/2),Math.cos(a/2)],i*4);}

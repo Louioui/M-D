@@ -39,14 +39,18 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
   });
 
   return <>
-    <ambientLight intensity={1.4} />
-    <directionalLight position={[3, 5, 5]} intensity={3.5} />
-    <directionalLight position={[-4, 1, 2]} intensity={2} />
-    <pointLight position={[3, 1, -3]} color="#E63946" intensity={24} />
-    <Environment resolution={128} frames={1}>
-      <Lightformer intensity={4} position={[0, 4, 3]} scale={[8, 2, 1]} />
-      <Lightformer intensity={2} position={[-4, 0, 1]} scale={[2, 8, 1]} />
-      <Lightformer intensity={2} position={[4, 0, -2]} scale={[2, 8, 1]} />
+    <ambientLight intensity={.65} />
+    <directionalLight position={[-3, 5, 5]} color="#fff1dd" intensity={3.1} />
+    <directionalLight position={[4, 0, 3]} color="#c8ddff" intensity={1.65} />
+    <directionalLight position={[0, 3, -4]} color="#ecf3ff" intensity={3} />
+    <pointLight position={[3, 1, -3]} color="#E63946" intensity={12} />
+    {/* Captured once: narrow studio reflections reveal the bevels and socket depth
+        without animated lights, postprocessing passes, or per-frame allocations. */}
+    <Environment resolution={256} frames={1}>
+      <Lightformer intensity={3.4} color="#fff2df" position={[-1, 4, 3]} scale={[7, 1.4, 1]} />
+      <Lightformer intensity={2.6} color="#d4e5ff" position={[-4, 0, 2]} scale={[.7, 7, 1]} />
+      <Lightformer intensity={2.2} position={[4, 1, 1]} scale={[.45, 6, 1]} />
+      <Lightformer intensity={1.4} position={[0, -4, 2]} scale={[5, .4, 1]} />
     </Environment>
     <group ref={tilt} scale={1.38}><primitive object={badge} /></group>
   </>;

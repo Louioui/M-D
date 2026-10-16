@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { frameQuality } from '../lib/frameQuality';
 
 /** Demand rendering continues only while this canvas is visible and the tab is active. */
 export function useSceneActivity(reduced: boolean) {
@@ -32,21 +33,17 @@ export const SLOW_FRAME_SECONDS = .022; // < 45 fps
 export const SLOW_FRAME_RUN = 30;
 
 /**
- * Frame-time governor. Counts only consecutive rendered frames: with demand
- * rendering an idle gap (> 250 ms) is not a slow frame and resets the run.
+ * Frame-time governor. The scene explicitly reports continued animation, so a
+ * true idle gap resets the run while even >250ms active frames count as slow.
  * 0 = full quality, 1 = smaller shadow map + lower DPR, 2 = no shadows/micro-detail, DPR 1.
  */
-export function useFrameGovernor(enabled: boolean) {
+export function useFrameGovernor(enabled: boolean, animating: RefObject<boolean>) {
   const [level, setLevel] = useState(0);
-  const run = useRef(0);
+  const quality = useRef({ level: 0, slowRun: 0 });
   useFrame((_, delta) => {
     if (!enabled || level >= 2) return;
-    if (delta > .25) { run.current = 0; return; }
-    run.current = delta > SLOW_FRAME_SECONDS ? run.current + 1 : 0;
-    if (run.current >= SLOW_FRAME_RUN) {
-      run.current = 0;
-      setLevel(current => Math.min(2, current + 1));
-    }
+    const next = frameQuality(quality.current, delta, animating.current);
+    if (next !== level) setLevel(next);
   });
   return level;
 }

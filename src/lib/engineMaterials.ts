@@ -55,6 +55,7 @@ uniform vec3 uFlyCenter;
 uniform vec3 uFlyAxis;
 uniform float uFlyRadius;
 uniform float uAniso;
+uniform int uSurface;
 // x: sand-cast aluminium, y: machined flexplate steel, z: polymer, w: fasteners
 vec4 engineZones;
 float engineChrome;
@@ -78,15 +79,26 @@ const ZONES = /* glsl */`
   float zB = (1.0 - smoothstep(uFlyRadius * 0.94, uFlyRadius * 1.06, radial)) * smoothstep(-0.07, -0.02, axial);
   float zC = (1.0 - smoothstep(0.16, 0.26, lum)) * (1.0 - zB);
   float zE = smoothstep(0.56, 0.72, lum) * smoothstep(0.3, 0.45, vEnginePos.y) * smoothstep(0.2, 0.45, vCurv) * (1.0 - sat) * (1.0 - zB) * (1.0 - zC);
-  float zD = smoothstep(0.55, 0.78, vCurv) * (1.0 - zB) * (1.0 - zC) * (1.0 - zE);
+  float zD = smoothstep(0.72, 0.94, vCurv) * 0.32 * (1.0 - zB) * (1.0 - zC) * (1.0 - zE);
   float zA = clamp(1.0 - zB - zC - zD - zE, 0.0, 1.0);
+  // New modeled components carry explicit semantic finishes: no colour guessing.
+  if (uSurface > 0) {
+    zA = uSurface == 1 ? 1.0 : 0.0; zB = uSurface == 2 ? 1.0 : 0.0;
+    zC = uSurface == 3 || uSurface == 6 || uSurface == 7 ? 1.0 : 0.0;
+    zD = uSurface == 4 ? 1.0 : 0.0; zE = uSurface == 5 ? 1.0 : 0.0;
+  }
   engineZones = vec4(zA, zB, zC, zD);
   engineChrome = zE;
+  // De-light part of the inherited atlas to remove painted white reflection streaks.
+  if (uSurface == 0) {
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.43,0.46,0.49), zA * 0.55);
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.025,0.029,0.035), zC * 0.70);
+  }
   // Heat cycling: bronze/amber on the exhaust (-Z) flank and along the head gasket seam.
-  float exhaust = smoothstep(-0.5, -0.72, vEnginePos.z) * smoothstep(-0.15, 0.1, vEnginePos.y) * (1.0 - smoothstep(0.45, 0.62, vEnginePos.y));
+  float exhaust = (1.0-smoothstep(-0.72, -0.5, vEnginePos.z)) * smoothstep(-0.15, 0.1, vEnginePos.y) * (1.0 - smoothstep(0.45, 0.62, vEnginePos.y));
   float seam = 1.0 - smoothstep(0.0, 0.03, abs(vEnginePos.y - 0.18));
   float heat = clamp(exhaust + seam * 0.5, 0.0, 1.0) * zA;
-  diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.16, 0.95, 0.72), heat * 0.42);
+  diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * vec3(1.04, 0.98, 0.94), heat * 0.18);
   // Oiled crevice occlusion: deepest in tooth roots, balancing holes and around bolt bases.
   diffuseColor.rgb *= 1.0 - clamp(vCav, 0.0, 1.0) * (0.3 + 0.38 * (zB + zD));
 }`;
@@ -110,8 +122,9 @@ const SURFACE = /* glsl */`
     engineHeight = engineZones.x * tri.r + engineZones.y * lathe + engineZones.z * tri.b + engineZones.w * mix(0.5, tri.r, 0.3) + engineChrome * 0.5;
     roughnessFactor += ((tri.r - 0.5) * 0.12 * engineZones.x + (tri.b - 0.5) * 0.1 * engineZones.z) * uDetail;
   }
-  float zoneRough = engineZones.x * 0.42 + engineZones.y * 0.22 + engineZones.z * 0.68 + engineZones.w * 0.18 + engineChrome * 0.08;
-  float zoneMetal = engineZones.x * 0.88 + engineZones.y * 0.96 + engineZones.z * 0.04 + engineZones.w * 0.95 + engineChrome;
+  float zoneRough = engineZones.x * 0.55 + engineZones.y * 0.33 + engineZones.z * 0.68 + engineZones.w * 0.29 + engineChrome * 0.22;
+  if (uSurface == 6) zoneRough = 0.85;
+  float zoneMetal = engineZones.x * 0.82 + engineZones.y * 0.94 + engineZones.z * 0.015 + engineZones.w * 0.90 + engineChrome;
   // Keep 28% of the authored roughness variation so baked wear still reads.
   roughnessFactor = clamp(mix(roughnessFactor, zoneRough, 0.72), 0.04, 1.0);
   metalnessFactor = clamp(mix(metalnessFactor, zoneMetal, 0.8), 0.0, 1.0);
@@ -176,7 +189,7 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
     uFlyCenter: { value: FLYWHEEL.center.clone() },
     uFlyAxis: { value: FLYWHEEL.axis.clone() },
     uFlyRadius: { value: FLYWHEEL.radius },
-    uAniso: { value: options.clearcoat ? .62 : 0 },
+    uAniso: { value: options.clearcoat ? .22 : 0 },
   };
   const materials = new Map<MeshStandardMaterial, MeshPhysicalMaterial>();
   const supports: { direction: Vector3; point: Vector3; score: number }[] = [];
@@ -186,7 +199,7 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
   const vertex = new Vector3();
   model.updateMatrixWorld(true);
 
-  const upgrade = (original: MeshStandardMaterial) => {
+  const upgrade = (original: MeshStandardMaterial, surface: number) => {
     const existing = materials.get(original);
     if (existing) return existing;
     const material = new MeshPhysicalMaterial({
@@ -199,12 +212,12 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
       side: original.side, transparent: original.transparent, opacity: original.opacity, alphaTest: original.alphaTest,
     });
     material.envMapIntensity = .7;
-    material.normalScale.set(.6, .6);
-    material.clearcoat = options.clearcoat ? .35 : 0;
-    material.clearcoatRoughness = .12;
+    material.normalScale.set(surface === 0 ? .28 : .6, surface === 0 ? .28 : .6);
+    material.clearcoat = options.clearcoat ? .10 : 0;
+    material.clearcoatRoughness = .28;
     material.anisotropy = options.clearcoat ? 1 : 0; // Strength is set per pixel in LOBES.
     material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
-      Object.assign(shader.uniforms, uniforms);
+      Object.assign(shader.uniforms, uniforms, { uSurface: { value: surface } });
       shader.vertexShader = shader.vertexShader
         .replace('#include <common>', `#include <common>\n${VERTEX_PARS}`)
         .replace('#include <begin_vertex>', `#include <begin_vertex>\n${VERTEX_MAIN}`);
@@ -216,7 +229,7 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
         .replace('#include <lights_physical_fragment>', `#include <lights_physical_fragment>\n${LOBES}`)
         .replace('#include <opaque_fragment>', `${OUTPUT}\n#include <opaque_fragment>`);
     };
-    material.customProgramCacheKey = () => `md-engine-zones-v2-${options.clearcoat ? 'hq' : 'lite'}`;
+    material.customProgramCacheKey = () => `md-engine-rebuilt-v3-${options.clearcoat ? 'hq' : 'lite'}`;
     material.needsUpdate = true;
     materials.set(original, material);
     return material;
@@ -234,7 +247,8 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
         if (score > support.score) { support.score = score; support.point.copy(vertex); }
       }
     }
-    const convert = (material: unknown) => material instanceof MeshStandardMaterial ? upgrade(material) : material;
+    const surface = Number(object.userData.mdSurface) || 0;
+    const convert = (material: unknown) => material instanceof MeshStandardMaterial ? upgrade(material, surface) : material;
     object.material = Array.isArray(object.material) ? object.material.map(convert) : convert(object.material);
   });
 

@@ -4,16 +4,29 @@ import { Quaternion, Vector3 } from 'three';
 import { classifyDevice, cameraProfile } from './lib/deviceTier.ts';
 import { BADGE_IN, BADGE_OUT, ENGINE_IN, ENGINE_OUT, IDLE_GEAR_SPEED, createBadgeState, createEngineState, setFraming, solveBadge, solveEngine } from './lib/cameraSolver.ts';
 import { computeCurvature, computeTangents, generateDetailAtlas, weldVertices } from './lib/meshDetail.ts';
+import { frameQuality } from './lib/frameQuality.ts';
+
+test('quality governor distinguishes idle gaps from genuinely slow active frames',()=>{
+  const state={level:0,slowRun:0};
+  for(let i=0;i<40;i++)frameQuality(state,1,false);
+  assert.equal(state.level,0,'Idle demand rendering must not downgrade quality');
+  for(let i=0;i<30;i++)frameQuality(state,.4,true);
+  assert.equal(state.level,1,'Even very slow active frames must trigger a downgrade');
+  for(let i=0;i<29;i++)frameQuality(state,.03,true);
+  frameQuality(state,.016,true);assert.equal(state.slowRun,0);
+  for(let i=0;i<30;i++)frameQuality(state,.03,true);
+  assert.equal(state.level,2);
+});
 
 test('device tiering routes phones/tablets/low-memory devices to the mobile engine', () => {
   const phone = classifyDevice({ width: 390, height: 844, coarsePointer: true });
-  assert.equal(phone.tier, 'phone'); assert.deepEqual(phone.dpr, [1, 1.25]); assert.equal(phone.engineUrl, '/models/engine-mobile.glb'); assert.equal(phone.detailSize, 512);
+  assert.equal(phone.tier, 'phone'); assert.deepEqual(phone.dpr, [1, 1.25]); assert.equal(phone.engineUrl, '/models/engine-rebuilt-mobile.glb'); assert.equal(phone.detailSize, 512);
   const tablet = classifyDevice({ width: 1024, height: 1366, coarsePointer: true });
-  assert.equal(tablet.tier, 'tablet'); assert.deepEqual(tablet.dpr, [1, 1.5]); assert.equal(tablet.engineUrl, '/models/engine-mobile.glb');
+  assert.equal(tablet.tier, 'tablet'); assert.deepEqual(tablet.dpr, [1, 1.5]); assert.equal(tablet.engineUrl, '/models/engine-rebuilt-mobile.glb');
   const desktop = classifyDevice({ width: 1440, height: 900, coarsePointer: false, deviceMemory: 8, hardwareConcurrency: 12 });
   assert.equal(desktop.tier, 'desktop'); assert.deepEqual(desktop.dpr, [1, 2]); assert.equal(desktop.detailSize, 2048); assert.equal(desktop.dracoWorkers, 4);
-  assert.equal(classifyDevice({ width: 1440, height: 900, coarsePointer: false, deviceMemory: 4 }).engineUrl, '/models/engine-mobile.glb');
-  assert.equal(classifyDevice({ width: 900, height: 700, coarsePointer: false }).engineUrl, '/models/engine-mobile.glb');
+  assert.equal(classifyDevice({ width: 1440, height: 900, coarsePointer: false, deviceMemory: 4 }).engineUrl, '/models/engine-rebuilt-mobile.glb');
+  assert.equal(classifyDevice({ width: 900, height: 700, coarsePointer: false }).engineUrl, '/models/engine-rebuilt-mobile.glb');
 });
 
 test('camera profile bands follow viewport aspect', () => {

@@ -116,4 +116,5 @@
 }
 @media(max-width:380px){.engine-chapter{font-size:10.5px;padding-inline:4px}.engine-modes>button{padding:0 6px;font-size:7.5px}}
 @media(max-aspect-ratio:6/5) and (max-height:720px){.engine-tour-cta{display:none}.engine-story{font-size:13px;line-height:1.5}.engine-scroll-note{display:none}}
+@media(max-aspect-ratio:6/5) and (max-height:720px){.engine-tour-stage{grid-template-rows:auto minmax(96px,1fr) auto auto auto}.engine-hud-card{overflow:visible}}
 @media(prefers-reduced-motion:reduce){.engine-card-inner,.engine-chapter-track>span,.engine-watermark,.engine-hud-card{will-change:auto}.engine-reticle-ring{animation:none}.engine-reticle{transition:none}.loading-gauge-track>span{transition:none}}

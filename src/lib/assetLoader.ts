@@ -89,7 +89,12 @@ export interface EngineAssets {
 
 function firstMesh(root: Object3D) {
   let found: Mesh | null = null;
-  root.traverse(object => { if (!found && object instanceof Mesh) found = object; });
+  let largest = 0;
+  root.traverse(object => {
+    if (object instanceof Mesh && object.geometry.getAttribute('position').count > largest) {
+      found = object; largest = object.geometry.getAttribute('position').count;
+    }
+  });
   if (!found) throw new Error('Engine model contains no mesh.');
   return found as Mesh;
 }
@@ -152,6 +157,14 @@ export function loadEngineAssets() {
     const decoded = performance.now();
     const mesh = firstMesh(gltf.scene);
     const geometry = mesh.geometry, count = geometry.getAttribute('position').count;
+    // Reconstructed hard-surface groups have explicit materials and clean normals.
+    // Only the inherited casting needs the expensive reconstruction analysis.
+    gltf.scene.traverse(object => {
+      if (!(object instanceof Mesh) || object === mesh) return;
+      const n = object.geometry.getAttribute('position').count;
+      object.geometry.setAttribute('aCurvature', object.geometry.getAttribute('_curvature') ?? new BufferAttribute(new Float32Array(n).fill(.25), 1));
+      object.geometry.setAttribute('aCavity', object.geometry.getAttribute('_cavity') ?? new BufferAttribute(new Float32Array(n), 1));
+    });
     try {
       const result = await runDetailWorker(geometry, profile.detailSize);
       console.info(`[md] ${profile.tier} engine ready: download ${Math.round(downloaded - started)} ms, Draco decode ${Math.round(decoded - downloaded)} ms, ` +

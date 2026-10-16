@@ -1,0 +1,1226 @@
+[
+  {
+    "tier": "studio",
+    "removedSoftTriangles": 188799,
+    "components": [
+      {
+        "name": "Head | cast cam carrier",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | machined gasket flange",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | perimeter seal",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | separate upper housing",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib.002",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener.003",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib.003",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | tapered cast oil pan",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | bolted upper flange",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | thin gasket reveal",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.002",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.003",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.003",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.004",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.004",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.004",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | drain plug",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | drain plug washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Acoustic cover | sealed lower rim",
+        "vertices": 224,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Acoustic cover | faceted molded shell",
+        "vertices": 288,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | shallow reinforcing ridge",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | shallow reinforcing ridge.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover emblem | outer",
+        "vertices": 4616,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover emblem | cross",
+        "vertices": 4616,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover emblem | upright",
+        "vertices": 4616,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 01",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 01 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 01",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 01",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 02",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 02 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 02",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 02",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 03",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 03 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 03",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 03",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 04",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 04 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 04",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 04",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake plenum | common air chamber",
+        "vertices": 1184,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | cast mating rail",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle bore | aluminum lip",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle bore | recessed interior",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | drilled stamped disc",
+        "vertices": 6754,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | machined hub",
+        "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | ring gear root",
+        "vertices": 3840,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | 120 beveled starter teeth",
+        "vertices": 15360,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 01",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 01 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 02",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 02 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 03",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 03 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 04",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 04 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 05",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 05 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 06",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 06 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 07",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 07 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 08",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 08 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | rigid formed line",
+        "vertices": 784,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head conduit | elbow",
+        "vertices": 592,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | ribbed protective loom",
+        "vertices": 588,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | sealed connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | separate locking tab",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | machined service cover",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | gasket reveal",
+        "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | machined perimeter lip",
+        "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 01",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 01 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 02",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 02 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 03",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 03 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 04",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 04 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 05",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 05 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 06",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 06 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      }
+    ],
+    "webGroups": [
+      {
+        "name": "MD | satin cast alloy",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | precision satin flexplate steel",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | gasket and ribbed conduit",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | molded graphite polymer",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | dark zinc fastener heads",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | polished rigid steel line",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | connector latch",
+        "nonManifoldEdges": 0
+      }
+    ],
+    "bytes": 8575336
+  },
+  {
+    "tier": "mobile",
+    "removedSoftTriangles": 89228,
+    "components": [
+      {
+        "name": "Head | cast cam carrier",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | machined gasket flange",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | perimeter seal",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | separate upper housing",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib.002",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener.003",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Valve cover | seated fastener washer.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head | foundry stiffening rib.003",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | tapered cast oil pan",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | bolted upper flange",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | thin gasket reveal",
+        "vertices": 176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.002",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.002",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.003",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.003",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | external cast rib.004",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener.004",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | flange fastener washer.004",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | drain plug",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sump | drain plug washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Acoustic cover | sealed lower rim",
+        "vertices": 224,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Acoustic cover | faceted molded shell",
+        "vertices": 288,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | shallow reinforcing ridge",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | shallow reinforcing ridge.001",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover | rubber locating mount.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover emblem | outer",
+        "vertices": 4616,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover emblem | cross",
+        "vertices": 4616,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cover emblem | upright",
+        "vertices": 4616,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 01",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 01 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 01",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 01",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 02",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 02 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 02",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 02",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 03",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 03 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 03",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 03",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 04",
+        "vertices": 1176,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake runner 04 | mold seam",
+        "vertices": 392,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake flange 04",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake gasket 04",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake plenum | common air chamber",
+        "vertices": 1184,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake | cast mating rail",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle bore | aluminum lip",
+        "vertices": 1024,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Throttle bore | recessed interior",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt.001",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Intake mounting bolt washer.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | drilled stamped disc",
+        "vertices": 6754,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | machined hub",
+        "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | ring gear root",
+        "vertices": 3840,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Flexplate | 120 beveled starter teeth",
+        "vertices": 15360,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 01",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 01 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 02",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 02 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 03",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 03 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 04",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 04 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 05",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 05 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 06",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 06 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 07",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 07 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 08",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Crank hub socket bolt 08 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Fuel rail | rigid formed line",
+        "vertices": 784,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Head conduit | elbow",
+        "vertices": 592,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule.001",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule.002",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Line crimp ferrule.003",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | ribbed protective loom",
+        "vertices": 588,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | sealed connector",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Harness | separate locking tab",
+        "vertices": 96,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | machined service cover",
+        "vertices": 768,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | gasket reveal",
+        "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing | machined perimeter lip",
+        "vertices": 1536,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 01",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 01 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 02",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 02 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 03",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 03 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 04",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 04 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 05",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 05 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 06",
+        "vertices": 480,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Timing cover bolt 06 washer",
+        "vertices": 512,
+        "nonManifoldEdges": 0
+      }
+    ],
+    "webGroups": [
+      {
+        "name": "MD | satin cast alloy.001",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | precision satin flexplate steel.001",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | gasket and ribbed conduit.001",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | molded graphite polymer.001",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | dark zinc fastener heads.001",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | polished rigid steel line.001",
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "MD | connector latch.001",
+        "nonManifoldEdges": 0
+      }
+    ],
+    "bytes": 4740816
+  }
+]

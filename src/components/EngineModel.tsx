@@ -16,13 +16,13 @@ import { engineHud } from '../lib/engineHud.ts';
 import type { EngineAssets } from '../lib/assetLoader.ts';
 import { useFrameGovernor, useSceneActivity } from './sceneHooks';
 
-// Correlated colour temperatures (Tanner Helland approximation) for the studio rig.
-const KELVIN_4500 = '#ffdbba', KELVIN_5600 = '#ffefe5', KELVIN_7000_NAVY = '#8ea7d1';
+// White-balanced warm key, neutral rim and cool fill, calibrated against the reference.
+const KELVIN_4500 = '#fff0e1', KELVIN_5600 = '#ffefe5', KELVIN_7000_NAVY = '#8ea7d1';
 const CRIMSON = '#E63946';
 
 /** Light intensities per inspection mode: [key, fill, rim, bounce, rake, ambient, env]. */
 const RIG: Record<InspectionMode, readonly number[]> = {
-  studio: [3.2, 1.15, 3.1, 3.2 * .15, 0, .22, .7],
+  studio: [2.3, 1.0, 2.4, 2.3 * .10, 0, .25, .55],
   cad: [1.2, .6, 1.2, 0, 0, .3, .3],
   spec: [.55, .2, 1.4, .1, 5.2, .06, .28],
 };
@@ -77,7 +77,8 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
   useEffect(() => { sendFraming(prepared.framing); }, [prepared]);
   const { visible, invalidate } = useSceneActivity(reduced);
   const setDpr = useThree(state => state.setDpr);
-  const level = useFrameGovernor(!reduced);
+  const animating = useRef(false);
+  const level = useFrameGovernor(!reduced, animating);
   const [target, setTarget] = useState<[number, number, number]>([0, .1, 0]);
   const stage = useRef<Group>(null);
   const applied = useRef({ x: NaN, y: NaN, z: NaN, w: NaN, fov: NaN });
@@ -128,6 +129,7 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
   useEffect(() => () => { ticks.dispose(); }, [ticks]);
 
   useFrame(({ camera, size, clock }, frameDelta) => {
+    animating.current = false;
     if (!visible.current || document.hidden) return;
     const delta = Math.min(frameDelta, .1);
     const progress = reduced ? (chapterAt(motion.tour) + .3) / 4 : motion.tour; // Reduced motion snaps between stops.
@@ -154,7 +156,7 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
         camera.quaternion.set(out[ENGINE_OUT.qx], out[ENGINE_OUT.qy], out[ENGINE_OUT.qz], out[ENGINE_OUT.qw]);
         if (camera.fov !== out[ENGINE_OUT.fov]) { camera.fov = out[ENGINE_OUT.fov]; camera.updateProjectionMatrix(); }
         last.x = out[ENGINE_OUT.qx]; last.y = out[ENGINE_OUT.qy]; last.z = out[ENGINE_OUT.qz]; last.w = out[ENGINE_OUT.qw]; last.fov = out[ENGINE_OUT.fov];
-        if (out[ENGINE_OUT.settled] < .5) invalidate();
+        if (out[ENGINE_OUT.settled] < .5) { animating.current = true; invalidate(); }
       }
     }
     if (stage.current) stage.current.rotation.y = reduced ? 0 : -engineChannel.latest[ENGINE_OUT.progress] * Math.PI * .3;
@@ -162,7 +164,7 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
     camera.updateMatrixWorld();
     tmp.copy(anchors[chapterAt(motion.tour)]).project(camera);
     engineHud.place((tmp.x * .5 + .5) * size.width, (-tmp.y * .5 + .5) * size.height, tmp.z < 1 && Math.abs(tmp.x) < 1.2 && Math.abs(tmp.y) < 1.2);
-    if (idle) invalidate();
+    if (idle) { animating.current = true; invalidate(); }
   });
 
   return <>
@@ -186,7 +188,8 @@ export default function EngineModel({ assets, reduced, mode, inspect, debugZones
       </mesh>)}
       <lineSegments geometry={ticks}><lineBasicMaterial color="#8D99AE" transparent opacity={.55} depthWrite={false} /></lineSegments>
     </group>
-    {inspect && <OrbitControls target={target} enableZoom={false} enablePan={false} enableDamping dampingFactor={.12}
+    {inspect && <OrbitControls target={target} enableZoom enablePan={false} enableDamping dampingFactor={.12}
+      minDistance={2.2} maxDistance={9} zoomSpeed={.65}
       minPolarAngle={.25} maxPolarAngle={Math.PI * .62} rotateSpeed={.7} />}
   </>;
 }

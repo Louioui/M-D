@@ -69,7 +69,9 @@ export default function ThreeCanvas({ kind, label, fallback, restoringLabel, int
   return <SceneBoundary fallback={fallback}>
     <div className="three-canvas">
       <Canvas
-        dpr={engine ? profile.dpr : [1, Math.min(2, profile.dpr[1] + .25)]}
+        // The badge canvas is small, so it renders at up to 2× everywhere: the
+        // lettering is the first thing a visitor reads.
+        dpr={engine ? profile.dpr : [1, 2]}
         frameloop="demand" resize={{ offsetSize: true }}
         shadows={engine && profile.shadows ? 'soft' : false}
         camera={{ position: engine ? [2.5, 1.5, 3.7] : [0, 0, 5.6], fov: 38, near: .1, far: 60 }}

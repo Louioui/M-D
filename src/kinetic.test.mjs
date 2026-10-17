@@ -55,6 +55,7 @@ test('shader injection fails loudly when a three.js chunk anchor is missing',()=
   assert.equal(inject('a\n#include <x>\nb','#include <x>','y'),'a\n#include <x>\ny\nb');
   assert.equal(inject('#include <x>','#include <x>','y','before'),'y\n#include <x>');
   assert.throws(()=>inject('void main(){}','#include <missing>','y'),/anchor not found/);
+  assert.equal(inject('a\n#include <x>\nb','#include <x>','y','replace'),'a\ny\nb');
 });
 
 test('engine audio level is a bounded RMS and silent input reads zero',()=>{
@@ -141,7 +142,9 @@ test('badge glint runs on a clock every SHEEN_PERIOD seconds, never from the cur
 
 test('badge finish owns its materials and upgrades in place when worker data lands',()=>{
   const source=fixture(),original=source.children[0].material;
-  const finish=prepareBadgeFinish(source,true);
+  original.map=new DataTexture();
+  const finish=prepareBadgeFinish(source,true,8);
+  assert.equal(original.map.anisotropy,8,'lettering texture gets anisotropic filtering');
   assert.notEqual(source.children[0].material,original);
   assert.ok('PHYSICAL' in finish.materials[0].defines,'Physical specular/IOR shader features survive the Standard material copy');
   assert.equal(finish.uniforms.uSheen.value,-1);

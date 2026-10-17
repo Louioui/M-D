@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer } from '@react-three/drei';
 import type { Group } from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -22,7 +22,8 @@ export default function BadgeModel({ gltf, reduced }: { gltf: GLTF; reduced: boo
     if (!gear) throw new Error('The articulated logo is missing its gear assembly.');
     return { badge, gear };
   }, [gltf]);
-  const finish = useMemo(() => prepareBadgeFinish(badge,deviceProfile().clearcoat),[badge]);
+  const maxAnisotropy = useThree(state => state.gl.capabilities.getMaxAnisotropy());
+  const finish = useMemo(() => prepareBadgeFinish(badge,deviceProfile().clearcoat,Math.min(16,maxAnisotropy)),[badge,maxAnisotropy]);
   useEffect(() => finish.dispose,[finish]);
   const tilt = useRef<Group>(null);
   const { visible, invalidate } = useSceneActivity(reduced);

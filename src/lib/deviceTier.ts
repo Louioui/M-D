@@ -34,7 +34,8 @@ export function classifyDevice(s: DeviceSignals): TierProfile {
     // who already cached the earlier geometry before a new Site deployment.
     engineUrl: compact ? '/models/engine-rebuilt-mobile.glb?v=kinetic-3' : '/models/engine-rebuilt-studio.glb?v=kinetic-3',
     detailSize: compact ? 512 : 2048,
-    dpr: tier === 'phone' ? [1, 1.25] : tier === 'tablet' ? [1, 1.5] : [1, 2],
+    // Sharper engine on phones/tablets; the frame governor still steps DPR down if a device struggles.
+    dpr: tier === 'phone' ? [1, 1.5] : tier === 'tablet' ? [1, 1.75] : [1, 2],
     shadows: !compact,
     clearcoat: !compact,
     dracoWorkers: Math.max(1, Math.min(s.hardwareConcurrency || 4, 4)),

@@ -207,7 +207,11 @@ if (uMode == 1) {
     + engineZones.w * vec3(1.0, 0.85, 0.1) + engineChrome * vec3(1.0, 0.1, 0.8);
 }`;
 
-export interface EngineMaterialOptions { detailMap: Texture; clearcoat: boolean; detailScale?: number }
+export interface EngineMaterialOptions {
+  detailMap: Texture; clearcoat: boolean; detailScale?: number;
+  /** GPU anisotropic filtering for the engine's textures (GLTFLoader leaves it at 1). */
+  maxAnisotropy?: number;
+}
 
 /** Clones the shared GLTF scene and upgrades its single atlas material to the zoned physical shader. */
 export function prepareEngineMaterials(source: Object3D, options: EngineMaterialOptions) {
@@ -229,9 +233,17 @@ export function prepareEngineMaterials(source: Object3D, options: EngineMaterial
   const solid = new Map<Mesh, Mesh['material']>();
   const materials = new Map<MeshStandardMaterial, MeshPhysicalMaterial>();
 
+  const anisotropy = Math.max(1, options.maxAnisotropy ?? 1);
+  const sharpen = (texture: Texture | null | undefined) => {
+    if (texture && texture.anisotropy < anisotropy) { texture.anisotropy = anisotropy; texture.needsUpdate = true; }
+  };
+  // Oblique faces (block sides, intake runners, flexplate) blur at anisotropy 1
+  // as the engine turns. Only the engine uses these cached textures.
+  sharpen(options.detailMap);
   const upgrade = (original: MeshStandardMaterial, surface: number) => {
     const existing = materials.get(original);
     if (existing) return existing;
+    [original.map, original.normalMap, original.roughnessMap, original.metalnessMap, original.aoMap, original.emissiveMap].forEach(sharpen);
     const material = new MeshPhysicalMaterial({
       name: original.name, color: original.color, map: original.map,
       normalMap: original.normalMap, normalMapType: original.normalMapType,

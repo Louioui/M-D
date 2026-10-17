@@ -105,7 +105,10 @@ function createBeamMaterial(points: boolean) {
 
 export default function EngineModel({ assets, reduced, mode, inspect, split, xray, heat, debugZones = false }: EngineModelProps) {
   const profile = deviceProfile();
-  const prepared = useMemo(() => prepareEngineMaterials(assets.gltf.scene, { detailMap: assets.detailMap, clearcoat: profile.clearcoat }), [assets, profile.clearcoat]);
+  const gpuAnisotropy = useThree(state => state.gl.capabilities.getMaxAnisotropy());
+  // 16× on desktop; phones/tablets cap at 8× to spare memory bandwidth.
+  const maxAnisotropy = Math.min(profile.tier === 'desktop' ? 16 : 8, gpuAnisotropy);
+  const prepared = useMemo(() => prepareEngineMaterials(assets.gltf.scene, { detailMap: assets.detailMap, clearcoat: profile.clearcoat, maxAnisotropy }), [assets, profile.clearcoat, maxAnisotropy]);
   const rig = useMemo(()=>createEngineRig(prepared.model),[prepared]);
   // One core material per cylinder (same program) so each flashes on its own stroke.
   const cores = useMemo(()=>FIRING_PHASE.map(phase=>{ const core=createPlasmaMaterial(prepared.uniforms,true); core.uniforms.uFiring.value=phase; return core; }),[prepared]);

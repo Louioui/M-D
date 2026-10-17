@@ -108,7 +108,10 @@ test('moving assembly bounds are finite and camera fit includes every exploded p
 
 test('X-ray swaps only instance materials, shares world-space heat, and restores physical shading',()=>{
   const source=fixture(),original=source.children[0].material,texture=new DataTexture();
-  const prepared=prepareEngineMaterials(source,{detailMap:texture,clearcoat:true});
+  source.children[0].material.map=new DataTexture();
+  const prepared=prepareEngineMaterials(source,{detailMap:texture,clearcoat:true,maxAnisotropy:16});
+  assert.equal(source.children[0].material.map.anisotropy,16,'engine textures get anisotropic filtering');
+  assert.equal(texture.anisotropy,16,'so does the procedural detail atlas');
   const physical=prepared.model.children[0].material;
   assert.notEqual(physical,original);
   prepared.setXray(true);assert.equal(prepared.model.children[0].material,prepared.plasma);

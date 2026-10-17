@@ -21,9 +21,9 @@ test('quality governor distinguishes idle gaps from genuinely slow active frames
 test('device tiering routes phones/tablets/low-memory devices to the mobile engine', () => {
   const path = profile => new URL(profile.engineUrl, 'https://shop.test').pathname;
   const phone = classifyDevice({ width: 390, height: 844, coarsePointer: true });
-  assert.equal(phone.tier, 'phone'); assert.deepEqual(phone.dpr, [1, 1.25]); assert.equal(path(phone), '/models/engine-rebuilt-mobile.glb'); assert.equal(phone.detailSize, 512);
+  assert.equal(phone.tier, 'phone'); assert.deepEqual(phone.dpr, [1, 1.5]); assert.equal(path(phone), '/models/engine-rebuilt-mobile.glb'); assert.equal(phone.detailSize, 512);
   const tablet = classifyDevice({ width: 1024, height: 1366, coarsePointer: true });
-  assert.equal(tablet.tier, 'tablet'); assert.deepEqual(tablet.dpr, [1, 1.5]); assert.equal(path(tablet), '/models/engine-rebuilt-mobile.glb');
+  assert.equal(tablet.tier, 'tablet'); assert.deepEqual(tablet.dpr, [1, 1.75]); assert.equal(path(tablet), '/models/engine-rebuilt-mobile.glb');
   const desktop = classifyDevice({ width: 1440, height: 900, coarsePointer: false, deviceMemory: 8, hardwareConcurrency: 12 });
   assert.equal(desktop.tier, 'desktop'); assert.deepEqual(desktop.dpr, [1, 2]); assert.equal(desktop.detailSize, 2048); assert.equal(desktop.dracoWorkers, 4);
   assert.equal(path(classifyDevice({ width: 1440, height: 900, coarsePointer: false, deviceMemory: 4 })), '/models/engine-rebuilt-mobile.glb');

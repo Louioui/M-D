@@ -99,6 +99,9 @@ export function solveEngine(state: EngineSolverState, input: Float32Array, out: 
   return out;
 }
 
+/** Badge tilt toward the pointer/gyro: max radians at the window edge, and how fast it follows. */
+export const BADGE_TILT = { x: .21, y: .31, follow: 10 } as const;
+
 export interface BadgeSolverState { speed: number; gear: number; tiltX: number; tiltY: number }
 export const createBadgeState = (): BadgeSolverState => ({ speed: IDLE_GEAR_SPEED, gear: 0, tiltX: 0, tiltY: 0 });
 
@@ -113,8 +116,8 @@ export function solveBadge(state: BadgeSolverState, input: Float32Array, out: Fl
     const target = Math.abs(velocity) > 35 ? MathUtils.clamp(velocity * .0025, -3, 3) : IDLE_GEAR_SPEED;
     state.speed = MathUtils.damp(state.speed, target, 5, dt);
     state.gear = (state.gear + state.speed * dt) % (Math.PI * 2);
-    state.tiltX = MathUtils.damp(state.tiltX, input[BADGE_IN.pointerY] * .15, 7, dt);
-    state.tiltY = MathUtils.damp(state.tiltY, input[BADGE_IN.pointerX] * .22, 7, dt);
+    state.tiltX = MathUtils.damp(state.tiltX, input[BADGE_IN.pointerY] * BADGE_TILT.x, BADGE_TILT.follow, dt);
+    state.tiltY = MathUtils.damp(state.tiltY, input[BADGE_IN.pointerX] * BADGE_TILT.y, BADGE_TILT.follow, dt);
   }
   out[BADGE_OUT.gear] = state.gear;
   out[BADGE_OUT.tiltX] = state.tiltX;
